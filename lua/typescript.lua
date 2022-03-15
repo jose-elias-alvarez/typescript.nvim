@@ -2388,6 +2388,7 @@ return ____exports
 local ____exports = {}
 ____exports.Methods = Methods or ({})
 ____exports.Methods.CODE_ACTION = "textDocument/codeAction"
+____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
 return ____exports
  end,
 ["utils"] = function(...) 
@@ -2399,6 +2400,94 @@ ____exports.getClient = function()
             return client
         end
     end
+end
+return ____exports
+ end,
+["rename-file"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+require("lualib_bundle");
+local ____exports = {}
+local ____lspconfig = require("lspconfig")
+local util = ____lspconfig.util
+local ____methods = require("types.methods")
+local Methods = ____methods.Methods
+local ____utils = require("utils")
+local getClient = ____utils.getClient
+local function sendRequest(source, target)
+    local client = getClient()
+    if not client then
+        print("failed to rename file: tsserver not running")
+        return
+    end
+    local requestOk = client.request(
+        Methods.EXECUTE_COMMAND,
+        {
+            command = "_typescript.applyRenameFile",
+            arguments = {{
+                sourceUri = vim.uri_from_fname(source),
+                targetUri = vim.uri_from_fname(target)
+            }}
+        }
+    )
+    if not requestOk then
+        print("failed to rename file: tsserver request failed")
+    end
+end
+____exports.renameFile = function(target, opts)
+    local bufnr = vim.api.nvim_get_current_buf()
+    local source = vim.api.nvim_buf_get_name(bufnr)
+    if not target then
+        do
+            local function ____catch(_)
+                return true
+            end
+            local ____try, ____hasReturned, ____returnValue = pcall(function()
+                vim.ui.input(
+                    {prompt = "New path: ", default = source},
+                    function(input)
+                        if not input or input == source then
+                            error(
+                                __TS__New(Error),
+                                0
+                            )
+                        end
+                        target = input
+                    end
+                )
+            end)
+            if not ____try then
+                ____hasReturned, ____returnValue = ____catch(____hasReturned)
+            end
+            if ____hasReturned then
+                return ____returnValue
+            end
+        end
+    end
+    target = target
+    local ____util_path_exists_result_2 = util.path.exists(target)
+    if ____util_path_exists_result_2 then
+        local ____opts_force_0 = opts
+        if ____opts_force_0 ~= nil then
+            ____opts_force_0 = ____opts_force_0.force
+        end
+        ____util_path_exists_result_2 = not ____opts_force_0
+    end
+    if ____util_path_exists_result_2 then
+        local status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No")
+        if status ~= 1 then
+            return
+        end
+    end
+    sendRequest(source, target)
+    if vim.api.nvim_buf_get_option(bufnr, "modified") then
+        vim.cmd("silent! noautocmd w")
+    end
+    local didRename, renameError = vim.loop.fs_rename(source, target)
+    if not didRename then
+        print((((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError)
+    end
+    vim.cmd("edit " .. target)
+    vim.cmd(tostring(bufnr) .. "bdelete")
 end
 return ____exports
  end,
@@ -2480,6 +2569,8 @@ return ____exports
 local ____exports = {}
 local ____config = require("config")
 local config = ____config.config
+local ____rename_2Dfile = require("rename-file")
+local renameFile = ____rename_2Dfile.renameFile
 local ____source_2Dactions = require("source-actions")
 local addMissingImports = ____source_2Dactions.addMissingImports
 local fixAll = ____source_2Dactions.fixAll
@@ -2489,6 +2580,14 @@ ____exports.setupCommands = function(bufnr)
     if config.disable_commands then
         return
     end
+    vim.api.nvim_buf_add_user_command(
+        bufnr,
+        "TypescriptRenameFile",
+        function(opts)
+            renameFile(nil, {force = opts.bang})
+        end,
+        {bang = true}
+    )
     vim.api.nvim_buf_add_user_command(
         bufnr,
         "TypescriptAddMissingImports",

@@ -4,7 +4,7 @@
     "target": "esnext",
     "lib": ["esnext"],
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": ["node", "typescript-to-lua/language-extensions"],
     "strict": true
   },
   "tstl": {

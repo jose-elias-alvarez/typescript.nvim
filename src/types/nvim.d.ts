@@ -10,9 +10,9 @@ declare namespace NvimLsp {
       this: void,
       method: import("./methods").Methods,
       params: Record<string, unknown>,
-      handler: (err: unknown, res: T[]) => void,
-      bufnr: number
-    ) => void;
+      handler?: (err: unknown, res: T[]) => void,
+      bufnr?: number
+    ) => boolean;
     request_sync: <T>(
       this: void,
       method: import("./methods").Methods,
@@ -62,6 +62,7 @@ declare namespace vim {
   };
   const api: {
     nvim_get_current_buf: (this: void) => number;
+    nvim_buf_get_name: (this: void, bufnr: number) => string;
     nvim_buf_add_user_command: (
       this: void,
       bufnr: number,
@@ -69,5 +70,25 @@ declare namespace vim {
       command: (opts: Nvim.CommandOptions) => void,
       attributes: Nvim.CommandAttributes
     ) => void;
+    nvim_buf_get_option: <T>(this: void, bufnr: number, name: string) => T;
+  };
+  const ui: {
+    input: (
+      this: void,
+      opts: { prompt?: string; default?: string },
+      on_confirm: (this: void, input?: string) => void
+    ) => void;
+  };
+  const fn: {
+    confirm: (this: void, message: string, choices: string) => number;
+  };
+  const cmd: (this: void, command: string) => void;
+  const uri_from_fname: (this: void, fname: string) => string;
+  const loop: {
+    fs_rename: (
+      this: void,
+      source: string,
+      target: string
+    ) => LuaMultiReturn<[boolean, string | undefined]>;
   };
 }

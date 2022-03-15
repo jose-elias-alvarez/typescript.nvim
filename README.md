@@ -17,10 +17,10 @@ Only works on 0.7. Anything may break at any time.
 - Organize imports
 - Remove unused variables
 - Fix all
+- Rename file (manual only)
 
 ## To port from [nvim-lsp-ts-utils](https://github.com/jose-elias-alvarez/nvim-lsp-ts-utils)
 
-- Rename file (manual only)
 - Inlay hints
 
 I don't plan on porting anything else, since the goal is to work upstream and

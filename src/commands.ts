@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { renameFile } from "./rename-file";
 import {
   addMissingImports,
   fixAll,
@@ -10,6 +11,15 @@ export const setupCommands = (bufnr: number) => {
   if (config.disable_commands) {
     return;
   }
+
+  vim.api.nvim_buf_add_user_command(
+    bufnr,
+    "TypescriptRenameFile",
+    (opts) => {
+      renameFile(undefined, { force: opts.bang });
+    },
+    { bang: true }
+  );
 
   vim.api.nvim_buf_add_user_command(
     bufnr,
