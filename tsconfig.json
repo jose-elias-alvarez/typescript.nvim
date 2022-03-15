@@ -4,14 +4,8 @@
     "target": "esnext",
     "lib": ["esnext"],
     "moduleResolution": "node",
-    "types": ["node", "typescript-to-lua/language-extensions"],
-    "strict": true
-  },
-  "tstl": {
-    "luaTarget": "JIT",
-    "luaBundle": "./lua/typescript.lua",
-    "luaBundleEntry": "./src/index.ts",
-    "noResolvePaths": ["lspconfig"],
-    "noImplicitSelf": true
+    "types": ["node", "jest", "typescript-to-lua/language-extensions"],
+    "strict": true,
+    "esModuleInterop": true
   }
 }

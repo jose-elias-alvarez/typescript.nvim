@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig",
+  "exclude": ["test", "__mocks__"],
+  "tstl": {
+    "luaTarget": "JIT",
+    "luaBundle": "./lua/typescript.lua",
+    "luaBundleEntry": "./src/index.ts",
+    "noResolvePaths": ["lspconfig"],
+    "noImplicitSelf": true
+  }
+}

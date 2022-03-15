@@ -2363,7 +2363,14 @@ function __TS__TypeOf(value)
 end
 
  end,
-["config"] = function(...) 
+["jest.config"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local config = {preset = "ts-jest", testEnvironment = "node", verbose = true, clearMocks = true}
+____exports.default = config
+return ____exports
+ end,
+["src.config"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 require("lualib_bundle");
 local ____exports = {}
@@ -2383,7 +2390,7 @@ ____exports.setupConfig = function(userOpts)
 end
 return ____exports
  end,
-["types.methods"] = function(...) 
+["src.types.methods"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports.Methods = Methods or ({})
@@ -2391,7 +2398,7 @@ ____exports.Methods.CODE_ACTION = "textDocument/codeAction"
 ____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
 return ____exports
  end,
-["utils"] = function(...) 
+["src.utils"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports.getClient = function()
@@ -2403,15 +2410,15 @@ ____exports.getClient = function()
 end
 return ____exports
  end,
-["rename-file"] = function(...) 
+["src.rename-file"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 require("lualib_bundle");
 local ____exports = {}
 local ____lspconfig = require("lspconfig")
 local util = ____lspconfig.util
-local ____methods = require("types.methods")
+local ____methods = require("src.types.methods")
 local Methods = ____methods.Methods
-local ____utils = require("utils")
+local ____utils = require("src.utils")
 local getClient = ____utils.getClient
 local function sendRequest(source, target)
     local client = getClient()
@@ -2482,7 +2489,7 @@ ____exports.renameFile = function(target, opts)
     if vim.api.nvim_buf_get_option(bufnr, "modified") then
         vim.cmd("silent! noautocmd w")
     end
-    local didRename, renameError = vim.loop.fs_rename(source, target)
+    local didRename, renameError = unpack(vim.loop.fs_rename(source, target))
     if not didRename then
         print((((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError)
     end
@@ -2491,13 +2498,13 @@ ____exports.renameFile = function(target, opts)
 end
 return ____exports
  end,
-["source-actions"] = function(...) 
+["src.source-actions"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 require("lualib_bundle");
 local ____exports = {}
-local ____methods = require("types.methods")
+local ____methods = require("src.types.methods")
 local Methods = ____methods.Methods
-local ____utils = require("utils")
+local ____utils = require("src.utils")
 local getClient = ____utils.getClient
 local SourceActions = SourceActions or ({})
 SourceActions.SourceAddMissingImportsTs = "source.addMissingImports.ts"
@@ -2564,14 +2571,14 @@ ____exports.fixAll = makeCommand(SourceActions.SourceFixAllTs)
 ____exports.removeUnused = makeCommand(SourceActions.SourceRemoveUnusedTs)
 return ____exports
  end,
-["commands"] = function(...) 
+["src.commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____config = require("config")
+local ____config = require("src.config")
 local config = ____config.config
-local ____rename_2Dfile = require("rename-file")
+local ____rename_2Dfile = require("src.rename-file")
 local renameFile = ____rename_2Dfile.renameFile
-local ____source_2Dactions = require("source-actions")
+local ____source_2Dactions = require("src.source-actions")
 local addMissingImports = ____source_2Dactions.addMissingImports
 local fixAll = ____source_2Dactions.fixAll
 local organizeImports = ____source_2Dactions.organizeImports
@@ -2623,21 +2630,23 @@ ____exports.setupCommands = function(bufnr)
 end
 return ____exports
  end,
-["lsp"] = function(...) 
+["src.lsp"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+require("lualib_bundle");
 local ____exports = {}
 local ____lspconfig = require("lspconfig")
 local tsserver = ____lspconfig.tsserver
-local ____commands = require("commands")
+local ____commands = require("src.commands")
 local setupCommands = ____commands.setupCommands
-local ____config = require("config")
+local ____config = require("src.config")
 local config = ____config.config
-____exports.setupLsp = function()
-    local ____config_server_0 = config.server
-    local on_init = ____config_server_0.on_init
-    local on_attach = ____config_server_0.on_attach
-    config.server.on_init = function(client, initialize_result)
-        if config.disable_formatting then
+____exports.setupLsp = function(overrides)
+    local resolvedConfig = __TS__ObjectAssign({}, config, overrides or ({}))
+    local ____resolvedConfig_server_0 = resolvedConfig.server
+    local on_init = ____resolvedConfig_server_0.on_init
+    local on_attach = ____resolvedConfig_server_0.on_attach
+    resolvedConfig.server.on_init = function(client, initialize_result)
+        if resolvedConfig.disable_formatting then
             client.resolved_capabilities.document_formatting = false
             client.resolved_capabilities.document_range_formatting = false
         end
@@ -2646,23 +2655,23 @@ ____exports.setupLsp = function()
             ____on_init_result_1 = ____on_init_result_1(client, initialize_result)
         end
     end
-    config.server.on_attach = function(client, bufnr)
+    resolvedConfig.server.on_attach = function(client, bufnr)
         setupCommands(bufnr)
         local ____on_attach_result_3 = on_attach
         if ____on_attach_result_3 ~= nil then
             ____on_attach_result_3 = ____on_attach_result_3(client, bufnr)
         end
     end
-    tsserver.setup(config.server)
+    tsserver.setup(resolvedConfig.server)
 end
 return ____exports
  end,
-["index"] = function(...) 
+["src.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____config = require("config")
+local ____config = require("src.config")
 local setupConfig = ____config.setupConfig
-local ____lsp = require("lsp")
+local ____lsp = require("src.lsp")
 local setupLsp = ____lsp.setupLsp
 ____exports.setup = function(userOptions)
     setupConfig(userOptions)
@@ -2671,4 +2680,4 @@ end
 return ____exports
  end,
 }
-return require("index", ...)
+return require("src.index", ...)
