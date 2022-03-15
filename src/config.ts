@@ -1,11 +1,21 @@
-const defaults: TypescriptNvim.Options = {
-  disable_commands: false,
-  disable_formatting: false,
-  server: {},
-};
+export interface ConfigOptions {
+  disable_commands: boolean;
+  disable_formatting: boolean;
+  server: NvimLsp.ServerOptions;
+}
 
-export let options: TypescriptNvim.Options = { ...defaults };
+class Config implements ConfigOptions {
+  disable_commands = false;
+  disable_formatting = false;
+  server: NvimLsp.ServerOptions = {};
 
-export const setupConfig = (userOpts: TypescriptNvim.Options) => {
-  options = { ...options, ...userOpts };
+  setup(userOpts: ConfigOptions) {
+    Object.assign(this, userOpts);
+  }
+}
+
+export const config = new Config();
+
+export const setupConfig = (userOpts: ConfigOptions) => {
+  config.setup(userOpts);
 };

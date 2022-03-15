@@ -1,4 +1,4 @@
-import { options } from "./config";
+import { config } from "./config";
 import {
   addMissingImports,
   fixAll,
@@ -7,7 +7,7 @@ import {
 } from "./source-actions";
 
 export const setupCommands = (bufnr: number) => {
-  if (options.disable_commands) {
+  if (config.disable_commands) {
     return;
   }
 

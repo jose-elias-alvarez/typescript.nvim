@@ -1,12 +1,12 @@
-import { options } from "./config";
 import { tsserver } from "lspconfig";
 import { setupCommands } from "./commands";
+import { config } from "./config";
 
 export const setupLsp = () => {
-  const { on_init, on_attach } = options.server;
+  const { on_init, on_attach } = config.server;
 
-  options.server.on_init = (client, initialize_result) => {
-    if (options.disable_formatting) {
+  config.server.on_init = (client, initialize_result) => {
+    if (config.disable_formatting) {
       client.resolved_capabilities.document_formatting = false;
       client.resolved_capabilities.document_range_formatting = false;
     }
@@ -14,11 +14,11 @@ export const setupLsp = () => {
     on_init?.(client, initialize_result);
   };
 
-  options.server.on_attach = (client, bufnr) => {
+  config.server.on_attach = (client, bufnr) => {
     setupCommands(bufnr);
 
     on_attach?.(client, bufnr);
   };
 
-  tsserver.setup(options.server);
+  tsserver.setup(config.server);
 };

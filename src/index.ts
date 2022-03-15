@@ -1,7 +1,7 @@
-import { setupConfig } from "./config";
+import { ConfigOptions, setupConfig } from "./config";
 import { setupLsp } from "./lsp";
 
-export const setup = (userOptions: TypescriptNvim.Options) => {
+export const setup = (userOptions: ConfigOptions) => {
   setupConfig(userOptions);
   setupLsp();
 };
