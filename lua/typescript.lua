@@ -2489,7 +2489,7 @@ ____exports.renameFile = function(target, opts)
     if vim.api.nvim_buf_get_option(bufnr, "modified") then
         vim.cmd("silent! noautocmd w")
     end
-    local didRename, renameError = unpack(vim.loop.fs_rename(source, target))
+    local didRename, renameError = vim.loop.fs_rename(source, target)
     if not didRename then
         print((((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError)
     end
