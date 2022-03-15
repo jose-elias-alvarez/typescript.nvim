@@ -1,7 +1,10 @@
 declare namespace NvimLsp {
   interface Client {
     name: string;
-    resolved_capabilities: Record<string, unknown>;
+    resolved_capabilities: {
+      document_formatting: boolean;
+      document_range_formatting: boolean;
+    };
     offset_encoding: string;
     request: <T>(
       this: void,
