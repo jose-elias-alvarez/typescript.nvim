@@ -2367,14 +2367,23 @@ end
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 require("lualib_bundle");
 local ____exports = {}
-local defaults = {disable_commands = false, disable_formatting = false, server = {}}
-____exports.options = __TS__ObjectAssign({}, defaults)
+local Config = __TS__Class()
+Config.name = "Config"
+function Config.prototype.____constructor(self)
+    self.disable_commands = false
+    self.disable_formatting = false
+    self.server = {}
+end
+function Config.prototype.setup(self, userOpts)
+    __TS__ObjectAssign(self, userOpts)
+end
+____exports.config = __TS__New(Config)
 ____exports.setupConfig = function(userOpts)
-    ____exports.options = __TS__ObjectAssign({}, ____exports.options, userOpts)
+    ____exports.config:setup(userOpts)
 end
 return ____exports
  end,
-["methods"] = function(...) 
+["types.methods"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports.Methods = Methods or ({})
@@ -2397,7 +2406,7 @@ return ____exports
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 require("lualib_bundle");
 local ____exports = {}
-local ____methods = require("methods")
+local ____methods = require("types.methods")
 local Methods = ____methods.Methods
 local ____utils = require("utils")
 local getClient = ____utils.getClient
@@ -2470,14 +2479,14 @@ return ____exports
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____config = require("config")
-local options = ____config.options
+local config = ____config.config
 local ____source_2Dactions = require("source-actions")
 local addMissingImports = ____source_2Dactions.addMissingImports
 local fixAll = ____source_2Dactions.fixAll
 local organizeImports = ____source_2Dactions.organizeImports
 local removeUnused = ____source_2Dactions.removeUnused
 ____exports.setupCommands = function(bufnr)
-    if options.disable_commands then
+    if config.disable_commands then
         return
     end
     vim.api.nvim_buf_add_user_command(
@@ -2518,18 +2527,18 @@ return ____exports
 ["lsp"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____config = require("config")
-local options = ____config.options
 local ____lspconfig = require("lspconfig")
 local tsserver = ____lspconfig.tsserver
 local ____commands = require("commands")
 local setupCommands = ____commands.setupCommands
+local ____config = require("config")
+local config = ____config.config
 ____exports.setupLsp = function()
-    local ____options_server_0 = options.server
-    local on_init = ____options_server_0.on_init
-    local on_attach = ____options_server_0.on_attach
-    options.server.on_init = function(client, initialize_result)
-        if options.disable_formatting then
+    local ____config_server_0 = config.server
+    local on_init = ____config_server_0.on_init
+    local on_attach = ____config_server_0.on_attach
+    config.server.on_init = function(client, initialize_result)
+        if config.disable_formatting then
             client.resolved_capabilities.document_formatting = false
             client.resolved_capabilities.document_range_formatting = false
         end
@@ -2538,14 +2547,14 @@ ____exports.setupLsp = function()
             ____on_init_result_1 = ____on_init_result_1(client, initialize_result)
         end
     end
-    options.server.on_attach = function(client, bufnr)
+    config.server.on_attach = function(client, bufnr)
         setupCommands(bufnr)
         local ____on_attach_result_3 = on_attach
         if ____on_attach_result_3 ~= nil then
             ____on_attach_result_3 = ____on_attach_result_3(client, bufnr)
         end
     end
-    tsserver.setup(options.server)
+    tsserver.setup(config.server)
 end
 return ____exports
  end,

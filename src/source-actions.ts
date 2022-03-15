@@ -1,5 +1,5 @@
 import { TextDocumentEdit } from "vscode-languageserver-types";
-import { Methods } from "./methods";
+import { Methods } from "./types/methods";
 import { getClient } from "./utils";
 
 enum SourceActions {

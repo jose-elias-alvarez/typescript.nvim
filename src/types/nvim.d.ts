@@ -71,11 +71,3 @@ declare namespace vim {
     ) => void;
   };
 }
-
-declare namespace TypescriptNvim {
-  interface Options {
-    server: NvimLsp.ServerOptions;
-    disable_commands?: boolean;
-    disable_formatting?: boolean;
-  }
-}
