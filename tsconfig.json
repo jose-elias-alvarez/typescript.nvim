@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/vscode-typescript-to-lua/master/tsconfig-schema.json",
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "types": ["node"],
+    "strict": true
+  },
+  "tstl": {
+    "luaTarget": "JIT",
+    "luaBundle": "./lua/typescript.lua",
+    "luaBundleEntry": "./src/index.ts",
+    "noResolvePaths": ["lspconfig"],
+    "noImplicitSelf": true
+  }
+}
