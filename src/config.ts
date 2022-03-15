@@ -1,7 +1,7 @@
 export interface ConfigOptions {
-  disable_commands: boolean;
-  disable_formatting: boolean;
-  server: NvimLsp.ServerOptions;
+  disable_commands?: boolean;
+  disable_formatting?: boolean;
+  server?: NvimLsp.ServerOptions;
 }
 
 class Config implements ConfigOptions {
