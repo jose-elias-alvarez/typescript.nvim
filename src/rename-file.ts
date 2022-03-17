@@ -2,6 +2,11 @@ import { util } from "lspconfig";
 import { Methods } from "./types/methods";
 import { getClient } from "./utils";
 
+interface ExecuteCommandParams {
+  command: string;
+  arguments: unknown[];
+}
+
 interface Opts {
   force?: boolean;
 }
@@ -13,15 +18,18 @@ const sendRequest = (source: string, target: string): void => {
     return;
   }
 
-  const requestOk = client.request(Methods.EXECUTE_COMMAND, {
-    command: "_typescript.applyRenameFile",
-    arguments: [
-      {
-        sourceUri: vim.uri_from_fname(source),
-        targetUri: vim.uri_from_fname(target),
-      },
-    ],
-  });
+  const requestOk = client.request<void, ExecuteCommandParams>(
+    Methods.EXECUTE_COMMAND,
+    {
+      command: "_typescript.applyRenameFile",
+      arguments: [
+        {
+          sourceUri: vim.uri_from_fname(source),
+          targetUri: vim.uri_from_fname(target),
+        },
+      ],
+    }
+  );
   if (!requestOk) {
     console.warn("failed to rename file: tsserver request failed");
   }

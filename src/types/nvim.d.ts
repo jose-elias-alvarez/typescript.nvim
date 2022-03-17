@@ -1,4 +1,11 @@
 declare namespace NvimLsp {
+  interface BaseParams {
+    textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
+  }
+  interface RangeParams extends BaseParams {
+    range: import("vscode-languageserver-types").Range;
+  }
+
   interface Client {
     name: string;
     resolved_capabilities: {
@@ -6,17 +13,17 @@ declare namespace NvimLsp {
       document_range_formatting: boolean;
     };
     offset_encoding: string;
-    request: <T>(
+    request: <T, U = Record<string, unknown>>(
       this: void,
       method: import("./methods").Methods,
-      params: Record<string, unknown>,
+      params: U,
       handler?: (err: unknown, res: T[]) => void,
       bufnr?: number
     ) => boolean;
-    request_sync: <T>(
+    request_sync: <T, U = Record<string, unknown>>(
       this: void,
       method: import("./methods").Methods,
-      params: Record<string, unknown>,
+      params: U,
       timeout_ms?: number,
       bufnr?: number
     ) => { result: T[] };
@@ -37,7 +44,7 @@ declare namespace Nvim {
 }
 
 declare namespace vim {
-  const inspect: (args: unknown) => void;
+  const inspect: (...args: unknown[]) => void;
   const lsp: {
     get_active_clients: (this: void) => NvimLsp.Client[];
     util: {

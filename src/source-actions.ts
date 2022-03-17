@@ -1,4 +1,4 @@
-import { TextDocumentEdit } from "vscode-languageserver-types";
+import { Diagnostic, TextDocumentEdit } from "vscode-languageserver-types";
 import { Methods } from "./types/methods";
 import { getClient } from "./utils";
 
@@ -7,6 +7,13 @@ enum SourceActions {
   SourceFixAllTs = "source.fixAll.ts",
   SourceRemoveUnusedTs = "source.removeUnused.ts",
   SourceOrganizeImportsTs = "source.organizeImports.ts",
+}
+
+interface SourceActionParams extends NvimLsp.RangeParams {
+  context: {
+    only: SourceActions[];
+    diagnostics: Diagnostic[];
+  };
 }
 
 interface Result {
@@ -47,7 +54,7 @@ const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
   };
 
   if (opts?.sync) {
-    const res = client.request_sync<Result>(
+    const res = client.request_sync<Result, SourceActionParams>(
       Methods.CODE_ACTION,
       params,
       undefined,
@@ -55,7 +62,7 @@ const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
     );
     applyEdits(res.result);
   } else {
-    client.request<Result>(
+    client.request<Result, SourceActionParams>(
       Methods.CODE_ACTION,
       params,
       (_, res) => applyEdits(res),
