@@ -2606,33 +2606,25 @@ ____exports.setupCommands = function(bufnr)
     vim.api.nvim_buf_add_user_command(
         bufnr,
         "TypescriptAddMissingImports",
-        function(opts)
-            addMissingImports({sync = opts.bang})
-        end,
+        function(opts) return addMissingImports({sync = opts.bang}) end,
         {bang = true}
     )
     vim.api.nvim_buf_add_user_command(
         bufnr,
         "TypescriptOrganizeImports",
-        function(opts)
-            organizeImports({sync = opts.bang})
-        end,
+        function(opts) return organizeImports({sync = opts.bang}) end,
         {bang = true}
     )
     vim.api.nvim_buf_add_user_command(
         bufnr,
         "TypescriptFixAll",
-        function(opts)
-            fixAll({sync = opts.bang})
-        end,
+        function(opts) return fixAll({sync = opts.bang}) end,
         {bang = true}
     )
     vim.api.nvim_buf_add_user_command(
         bufnr,
         "TypescriptRemoveUnused",
-        function(opts)
-            removeUnused({sync = opts.bang})
-        end,
+        function(opts) return removeUnused({sync = opts.bang}) end,
         {bang = true}
     )
 end

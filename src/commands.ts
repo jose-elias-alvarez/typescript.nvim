@@ -42,33 +42,25 @@ export const setupCommands = (bufnr: number) => {
   vim.api.nvim_buf_add_user_command(
     bufnr,
     "TypescriptAddMissingImports",
-    (opts) => {
-      addMissingImports({ sync: opts.bang });
-    },
+    (opts) => addMissingImports({ sync: opts.bang }),
     { bang: true }
   );
   vim.api.nvim_buf_add_user_command(
     bufnr,
     "TypescriptOrganizeImports",
-    (opts) => {
-      organizeImports({ sync: opts.bang });
-    },
+    (opts) => organizeImports({ sync: opts.bang }),
     { bang: true }
   );
   vim.api.nvim_buf_add_user_command(
     bufnr,
     "TypescriptFixAll",
-    (opts) => {
-      fixAll({ sync: opts.bang });
-    },
+    (opts) => fixAll({ sync: opts.bang }),
     { bang: true }
   );
   vim.api.nvim_buf_add_user_command(
     bufnr,
     "TypescriptRemoveUnused",
-    (opts) => {
-      removeUnused({ sync: opts.bang });
-    },
+    (opts) => removeUnused({ sync: opts.bang }),
     { bang: true }
   );
 };
