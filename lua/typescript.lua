@@ -2405,7 +2405,6 @@ return ____exports
  end,
 ["rename-file"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-require("lualib_bundle");
 local ____exports = {}
 local ____lspconfig = require("lspconfig")
 local util = ____lspconfig.util
@@ -2416,10 +2415,9 @@ local getClient = ____utils.getClient
 local function sendRequest(source, target)
     local client = getClient()
     if not client then
-        print("failed to rename file: tsserver not running")
-        return
+        return false
     end
-    local requestOk = client.request(
+    return client.request(
         Methods.EXECUTE_COMMAND,
         {
             command = "_typescript.applyRenameFile",
@@ -2429,41 +2427,10 @@ local function sendRequest(source, target)
             }}
         }
     )
-    if not requestOk then
-        print("failed to rename file: tsserver request failed")
-    end
 end
-____exports.renameFile = function(target, opts)
-    local bufnr = vim.api.nvim_get_current_buf()
-    local source = vim.api.nvim_buf_get_name(bufnr)
-    if not target then
-        do
-            local function ____catch(_)
-                return true
-            end
-            local ____try, ____hasReturned, ____returnValue = pcall(function()
-                vim.ui.input(
-                    {prompt = "New path: ", default = source},
-                    function(input)
-                        if not input or input == source then
-                            error(
-                                __TS__New(Error),
-                                0
-                            )
-                        end
-                        target = input
-                    end
-                )
-            end)
-            if not ____try then
-                ____hasReturned, ____returnValue = ____catch(____hasReturned)
-            end
-            if ____hasReturned then
-                return ____returnValue
-            end
-        end
-    end
-    target = target
+____exports.renameFile = function(source, target, opts)
+    local source_bufnr = vim.fn.bufadd(source)
+    vim.fn.bufload(source_bufnr)
     local ____util_path_exists_result_2 = util.path.exists(target)
     if ____util_path_exists_result_2 then
         local ____opts_force_0 = opts
@@ -2478,16 +2445,29 @@ ____exports.renameFile = function(target, opts)
             return
         end
     end
-    sendRequest(source, target)
-    if vim.api.nvim_buf_get_option(bufnr, "modified") then
-        vim.cmd("silent! noautocmd w")
+    local requestOk = sendRequest(source, target)
+    if not requestOk then
+        print("failed to rename file: tsserver request failed")
+        return
+    end
+    if vim.api.nvim_buf_get_option(source_bufnr, "modified") then
+        vim.api.nvim_buf_call(
+            source_bufnr,
+            function() return vim.cmd("w!") end
+        )
     end
     local didRename, renameError = vim.loop.fs_rename(source, target)
     if not didRename then
         print((((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError)
+        return
     end
-    vim.cmd("edit " .. target)
-    vim.cmd(tostring(bufnr) .. "bdelete")
+    local target_bufnr = vim.fn.bufadd(target)
+    for ____, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_get_buf(win) == source_bufnr then
+            vim.api.nvim_win_set_buf(win, target_bufnr)
+        end
+    end
+    vim.api.nvim_buf_delete(source_bufnr, {force = true})
 end
 return ____exports
  end,
@@ -2566,6 +2546,7 @@ return ____exports
  end,
 ["commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+require("lualib_bundle");
 local ____exports = {}
 local ____config = require("config")
 local config = ____config.config
@@ -2584,7 +2565,41 @@ ____exports.setupCommands = function(bufnr)
         bufnr,
         "TypescriptRenameFile",
         function(opts)
-            renameFile(nil, {force = opts.bang})
+            local source = vim.api.nvim_buf_get_name(0)
+            local target
+            do
+                local function ____catch(_)
+                    return true
+                end
+                local ____try, ____hasReturned, ____returnValue = pcall(function()
+                    vim.ui.input(
+                        {prompt = "New path: ", default = source},
+                        function(input)
+                            if not input or input == source then
+                                error(
+                                    __TS__New(Error),
+                                    0
+                                )
+                            end
+                            target = input
+                        end
+                    )
+                end)
+                if not ____try then
+                    ____hasReturned, ____returnValue = ____catch(____hasReturned)
+                end
+                if ____hasReturned then
+                    return ____returnValue
+                end
+            end
+            if not target then
+                return
+            end
+            renameFile(
+                vim.api.nvim_buf_get_name(0),
+                target,
+                {force = opts.bang}
+            )
         end,
         {bang = true}
     )
