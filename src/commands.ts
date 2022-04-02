@@ -16,7 +16,25 @@ export const setupCommands = (bufnr: number) => {
     bufnr,
     "TypescriptRenameFile",
     (opts) => {
-      renameFile(undefined, { force: opts.bang });
+      const source = vim.api.nvim_buf_get_name(0);
+      let target: string | undefined;
+      try {
+        vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
+          if (!input || input === source) {
+            throw new Error();
+          }
+          target = input;
+        });
+      } catch (_) {
+        return;
+      }
+      if (!target) {
+        return;
+      }
+
+      renameFile(vim.api.nvim_buf_get_name(0), target, {
+        force: opts.bang,
+      });
     },
     { bang: true }
   );

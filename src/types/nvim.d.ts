@@ -69,6 +69,7 @@ declare namespace vim {
   };
   const api: {
     nvim_get_current_buf: (this: void) => number;
+    nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
     nvim_buf_get_name: (this: void, bufnr: number) => string;
     nvim_buf_add_user_command: (
       this: void,
@@ -78,6 +79,14 @@ declare namespace vim {
       attributes: Nvim.CommandAttributes
     ) => void;
     nvim_buf_get_option: <T>(this: void, bufnr: number, name: string) => T;
+    nvim_buf_delete: (
+      this: void,
+      bufnr: number,
+      opts?: { force?: boolean }
+    ) => void;
+    nvim_list_wins: (this: void) => number[];
+    nvim_win_get_buf: (this: void, win: number) => number;
+    nvim_win_set_buf: (this: void, win: number, bufnr: number) => void;
   };
   const ui: {
     input: (
@@ -87,7 +96,9 @@ declare namespace vim {
     ) => void;
   };
   const fn: {
-    confirm: (this: void, message: string, choices: string) => number;
+    confirm: (this: void, message: string, choices: string) => 0 | 1;
+    bufadd: (this: void, bufname: string) => number;
+    bufload: (this: void, bufnr: number) => void;
   };
   const cmd: (this: void, command: string) => void;
   const uri_from_fname: (this: void, fname: string) => string;

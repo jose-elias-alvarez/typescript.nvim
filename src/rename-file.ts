@@ -11,48 +11,31 @@ interface Opts {
   force?: boolean;
 }
 
-const sendRequest = (source: string, target: string): void => {
+const sendRequest = (source: string, target: string): boolean => {
   const client = getClient();
   if (!client) {
-    console.warn("failed to rename file: tsserver not running");
-    return;
+    return false;
   }
 
-  const requestOk = client.request<void, ExecuteCommandParams>(
-    Methods.EXECUTE_COMMAND,
-    {
-      command: "_typescript.applyRenameFile",
-      arguments: [
-        {
-          sourceUri: vim.uri_from_fname(source),
-          targetUri: vim.uri_from_fname(target),
-        },
-      ],
-    }
-  );
-  if (!requestOk) {
-    console.warn("failed to rename file: tsserver request failed");
-  }
+  return client.request<void, ExecuteCommandParams>(Methods.EXECUTE_COMMAND, {
+    command: "_typescript.applyRenameFile",
+    arguments: [
+      {
+        sourceUri: vim.uri_from_fname(source),
+        targetUri: vim.uri_from_fname(target),
+      },
+    ],
+  });
 };
 
-export const renameFile = (target?: string, opts?: Opts): void => {
-  const bufnr = vim.api.nvim_get_current_buf();
-  const source = vim.api.nvim_buf_get_name(bufnr);
+export const renameFile = (
+  source: string,
+  target: string,
+  opts?: Opts
+): void => {
+  const source_bufnr = vim.fn.bufadd(source);
+  vim.fn.bufload(source_bufnr);
 
-  if (!target) {
-    try {
-      vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
-        if (!input || input === source) {
-          throw new Error();
-        }
-        target = input;
-      });
-    } catch (_) {
-      return;
-    }
-  }
-
-  target = target as string;
   if (util.path.exists(target) && !opts?.force) {
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
     if (status !== 1) {
@@ -60,17 +43,28 @@ export const renameFile = (target?: string, opts?: Opts): void => {
     }
   }
 
-  sendRequest(source, target);
-  if (vim.api.nvim_buf_get_option<boolean>(bufnr, "modified")) {
-    vim.cmd("silent! noautocmd w");
+  const requestOk = sendRequest(source, target);
+  if (!requestOk) {
+    console.warn("failed to rename file: tsserver request failed");
+    return;
+  }
+
+  if (vim.api.nvim_buf_get_option<boolean>(source_bufnr, "modified")) {
+    vim.api.nvim_buf_call(source_bufnr, () => vim.cmd("w!"));
   }
   const [didRename, renameError] = vim.loop.fs_rename(source, target);
   if (!didRename) {
     console.error(
       `failed to move ${source} to ${target}: ${renameError as string}`
     );
+    return;
   }
 
-  vim.cmd(`edit ${target}`);
-  vim.cmd(`${bufnr}bdelete`);
+  const target_bufnr = vim.fn.bufadd(target);
+  for (const win of vim.api.nvim_list_wins()) {
+    if (vim.api.nvim_win_get_buf(win) === source_bufnr) {
+      vim.api.nvim_win_set_buf(win, target_bufnr);
+    }
+  }
+  vim.api.nvim_buf_delete(source_bufnr, { force: true });
 };
