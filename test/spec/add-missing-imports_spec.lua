@@ -20,7 +20,7 @@ const notification: UserNotification = { user: testUser, content: "hello" };
         it("imports missing types", function()
             local assert_final = test_utils.setup_test_file("add-missing-imports", content, final)
 
-            vim.cmd("TypescriptAddMissingImports!")
+            require("typescript").actions.addMissingImports({ sync = true })
 
             assert_final()
         end)

@@ -24,7 +24,7 @@ console.log(notification);
         it("organizes out-of-order imports", function()
             local assert_final = test_utils.setup_test_file("organize-imports", content, final)
 
-            vim.cmd("TypescriptOrganizeImports!")
+            require("typescript").actions.organizeImports({ sync = true })
 
             assert_final()
         end)

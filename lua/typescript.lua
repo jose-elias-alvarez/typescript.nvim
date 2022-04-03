@@ -2677,6 +2677,12 @@ ____exports.setup = function(userOptions)
     setupConfig(userOptions)
     setupLsp()
 end
+____exports.actions = require("source-actions")
+do
+    local ____rename_2Dfile = require("rename-file")
+    local renameFile = ____rename_2Dfile.renameFile
+    ____exports.renameFile = renameFile
+end
 return ____exports
  end,
 }

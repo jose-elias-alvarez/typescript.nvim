@@ -5,3 +5,6 @@ export const setup = (userOptions: ConfigOptions) => {
   setupConfig(userOptions);
   setupLsp();
 };
+
+export * as actions from "./source-actions";
+export { renameFile } from "./rename-file";

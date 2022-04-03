@@ -18,7 +18,7 @@ const myAsyncFunc = async () => await mySyncFunc();
         it("adds async to non-async function", function()
             local assert_final = test_utils.setup_test_file("fix-all-async", content, final)
 
-            vim.cmd("TypescriptFixAll!")
+            require("typescript").actions.fixAll({ sync = true })
 
             assert_final()
         end)
@@ -40,7 +40,7 @@ const myUnreachableFunc = () => {
         it("removes unreachable return statement", function()
             local assert_final = test_utils.setup_test_file("fix-all-unreachable", content, final)
 
-            vim.cmd("TypescriptFixAll!")
+            require("typescript").actions.fixAll({ sync = true })
 
             assert_final()
         end)
