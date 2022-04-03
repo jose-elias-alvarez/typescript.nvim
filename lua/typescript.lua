@@ -2467,7 +2467,7 @@ ____exports.renameFile = function(source, target, opts)
             vim.api.nvim_win_set_buf(win, target_bufnr)
         end
     end
-    vim.api.nvim_buf_delete(source_bufnr, {force = true})
+    vim.schedule(function() return vim.api.nvim_buf_delete(source_bufnr, {force = true}) end)
 end
 return ____exports
  end,

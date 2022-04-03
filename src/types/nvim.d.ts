@@ -45,6 +45,7 @@ declare namespace Nvim {
 
 declare namespace vim {
   const inspect: (...args: unknown[]) => void;
+  const schedule: (this: void, callback: () => void) => void;
   const lsp: {
     get_active_clients: (this: void) => NvimLsp.Client[];
     util: {

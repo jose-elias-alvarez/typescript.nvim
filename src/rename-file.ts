@@ -66,5 +66,5 @@ export const renameFile = (
       vim.api.nvim_win_set_buf(win, target_bufnr);
     }
   }
-  vim.api.nvim_buf_delete(source_bufnr, { force: true });
+  vim.schedule(() => vim.api.nvim_buf_delete(source_bufnr, { force: true }));
 };
