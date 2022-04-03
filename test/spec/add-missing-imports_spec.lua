@@ -3,13 +3,26 @@ local test_utils = require("./test-utils")
 describe("TypescriptAddMissingImports", function()
     test_utils.setup()
 
-    it("imports missing types", function()
-        local final = [[import { User, UserNotification } from "./types";]]
-        test_utils.edit_test_file("add-missing-imports.ts", true)
-        assert.is_not.equals(test_utils.get_content()[1], final)
+    describe("types", function()
+        local content = [[
+const testUser: User = { name: "Jose" };
 
-        vim.cmd("TypescriptAddMissingImports!")
+const notification: UserNotification = { user: testUser, content: "hello" };
+       ]]
+        local final = [[
+import { User, UserNotification } from "./types";
 
-        assert.equals(test_utils.get_content()[1], final)
+const testUser: User = { name: "Jose" };
+
+const notification: UserNotification = { user: testUser, content: "hello" };
+       ]]
+
+        it("imports missing types", function()
+            local assert_final = test_utils.setup_test_file("add-missing-imports", content, final)
+
+            vim.cmd("TypescriptAddMissingImports!")
+
+            assert_final()
+        end)
     end)
 end)

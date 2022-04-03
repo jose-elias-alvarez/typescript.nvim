@@ -1,6 +1,7 @@
-local M = {}
+local join = require("lspconfig").util.path.join
+local test_dir = join(vim.loop.cwd(), "test", "fixtures")
 
-M.attached = false
+local M = { attached = false }
 
 M.setup = function()
     require("typescript").setup({
@@ -26,22 +27,35 @@ M.setup = function()
     end)
 end
 
-M.edit_test_file = function(name, wait_for_diagnostics)
-    vim.cmd(string.format("edit %s", require("lspconfig").util.path.join(vim.loop.cwd(), "test", "fixtures", name)))
+M.setup_test_file = function(name, content, final, skip_diagnostics)
+    local path = join(test_dir, name .. ".ts")
+    local fd = vim.loop.fs_open(path, "w", 438)
+    vim.loop.fs_write(fd, content, -1)
+    vim.loop.fs_close(fd)
+
+    vim.cmd(string.format("edit %s", path))
     vim.wait(1000, function()
         return M.attached == true
     end)
 
-    if wait_for_diagnostics then
+    if not skip_diagnostics then
         vim.wait(1000, function()
             return #vim.diagnostic.get(0) > 0
         end)
     end
-end
 
-M.get_content = function(bufnr)
-    bufnr = bufnr or vim.api.nvim_get_current_buf()
-    return vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.api.nvim_create_autocmd("BufDelete", {
+        buffer = bufnr,
+        once = true,
+        callback = function()
+            vim.loop.fs_unlink(path)
+        end,
+    })
+
+    return function()
+        assert.equals(table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"), final)
+    end
 end
 
 return M

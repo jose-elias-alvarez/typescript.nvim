@@ -3,13 +3,30 @@ local test_utils = require("./test-utils")
 describe("TypescriptOrganizeImports", function()
     test_utils.setup()
 
-    it("organizes out-of-order imports", function()
-        local final = [[import { User, UserNotification } from "./types";]]
-        test_utils.edit_test_file("organize-imports.ts", true)
-        assert.is_not.equals(test_utils.get_content()[1], final)
+    describe("out-of-order imports", function()
+        local content = [[
+import { UserNotification, User } from "./types";
 
-        vim.cmd("TypescriptOrganizeImports!")
+const user: User = { name: "Jose" };
+const notification: UserNotification = { content: "hi", user };
 
-        assert.equals(test_utils.get_content()[1], final)
+console.log(notification);
+        ]]
+        local final = [[
+import { User, UserNotification } from "./types";
+
+const user: User = { name: "Jose" };
+const notification: UserNotification = { content: "hi", user };
+
+console.log(notification);
+        ]]
+
+        it("organizes out-of-order imports", function()
+            local assert_final = test_utils.setup_test_file("organize-imports", content, final)
+
+            vim.cmd("TypescriptOrganizeImports!")
+
+            assert_final()
+        end)
     end)
 end)
