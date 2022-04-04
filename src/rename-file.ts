@@ -45,7 +45,7 @@ export const renameFile = (
 
   const requestOk = sendRequest(source, target);
   if (!requestOk) {
-    console.warn("failed to rename file: tsserver request failed");
+    print("failed to rename file: tsserver request failed");
     return;
   }
 
@@ -54,10 +54,9 @@ export const renameFile = (
   }
   const [didRename, renameError] = vim.loop.fs_rename(source, target);
   if (!didRename) {
-    console.error(
+    throw new Error(
       `failed to move ${source} to ${target}: ${renameError as string}`
     );
-    return;
   }
 
   const target_bufnr = vim.fn.bufadd(target);

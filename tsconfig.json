@@ -4,7 +4,7 @@
     "target": "esnext",
     "lib": ["esnext"],
     "moduleResolution": "node",
-    "types": ["node", "jest", "typescript-to-lua/language-extensions"],
+    "types": ["typescript-to-lua/language-extensions", "lua-types/jit"],
     "strict": true,
     "esModuleInterop": true
   }

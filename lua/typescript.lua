@@ -2405,6 +2405,7 @@ return ____exports
  end,
 ["rename-file"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+require("lualib_bundle");
 local ____exports = {}
 local ____lspconfig = require("lspconfig")
 local util = ____lspconfig.util
@@ -2458,8 +2459,10 @@ ____exports.renameFile = function(source, target, opts)
     end
     local didRename, renameError = vim.loop.fs_rename(source, target)
     if not didRename then
-        print((((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError)
-        return
+        error(
+            __TS__New(Error, (((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError),
+            0
+        )
     end
     local target_bufnr = vim.fn.bufadd(target)
     for ____, win in ipairs(vim.api.nvim_list_wins()) do
