@@ -5,6 +5,9 @@ server via [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and add
 commands for convenience. Written in TypeScript and transpiled to
 Lua using [TypeScriptToLua](https://github.com/TypeScriptToLua/TypeScriptToLua).
 
+This plugin is in **beta status**. It's stable enough for daily use, but
+breaking changes are possible.
+
 Requires Neovim 0.7.
 
 ## Setup
