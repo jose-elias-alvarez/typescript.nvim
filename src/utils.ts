@@ -1,5 +1,5 @@
-export const getClient = (): NvimLsp.Client | undefined => {
-  for (const client of vim.lsp.get_active_clients()) {
+export const getClient = (bufnr: number): NvimLsp.Client | undefined => {
+  for (const [, client] of vim.lsp.buf_get_clients(bufnr)) {
     if (client.name === "tsserver") {
       return client;
     }

@@ -27,12 +27,12 @@ interface Opts {
 }
 
 const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
-  const client = getClient();
+  const bufnr = vim.api.nvim_get_current_buf();
+  const client = getClient(bufnr);
   if (!client) {
     return;
   }
 
-  const bufnr = vim.api.nvim_get_current_buf();
   const params = {
     ...vim.lsp.util.make_range_params(),
     context: {

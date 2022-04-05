@@ -2394,8 +2394,8 @@ return ____exports
 ["utils"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-____exports.getClient = function()
-    for ____, client in ipairs(vim.lsp.get_active_clients()) do
+____exports.getClient = function(bufnr)
+    for ____, client in pairs(vim.lsp.buf_get_clients(bufnr)) do
         if client.name == "tsserver" then
             return client
         end
@@ -2413,8 +2413,8 @@ local ____methods = require("types.methods")
 local Methods = ____methods.Methods
 local ____utils = require("utils")
 local getClient = ____utils.getClient
-local function sendRequest(source, target)
-    local client = getClient()
+local function sendRequest(sourceBufnr, source, target)
+    local client = getClient(sourceBufnr)
     if not client then
         return false
     end
@@ -2430,8 +2430,8 @@ local function sendRequest(source, target)
     )
 end
 ____exports.renameFile = function(source, target, opts)
-    local source_bufnr = vim.fn.bufadd(source)
-    vim.fn.bufload(source_bufnr)
+    local sourceBufnr = vim.fn.bufadd(source)
+    vim.fn.bufload(sourceBufnr)
     local ____util_path_exists_result_2 = util.path.exists(target)
     if ____util_path_exists_result_2 then
         local ____opts_force_0 = opts
@@ -2446,14 +2446,14 @@ ____exports.renameFile = function(source, target, opts)
             return
         end
     end
-    local requestOk = sendRequest(source, target)
+    local requestOk = sendRequest(sourceBufnr, source, target)
     if not requestOk then
         print("failed to rename file: tsserver request failed")
         return
     end
-    if vim.api.nvim_buf_get_option(source_bufnr, "modified") then
+    if vim.api.nvim_buf_get_option(sourceBufnr, "modified") then
         vim.api.nvim_buf_call(
-            source_bufnr,
+            sourceBufnr,
             function() return vim.cmd("w!") end
         )
     end
@@ -2464,13 +2464,13 @@ ____exports.renameFile = function(source, target, opts)
             0
         )
     end
-    local target_bufnr = vim.fn.bufadd(target)
+    local targetBufnr = vim.fn.bufadd(target)
     for ____, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_get_buf(win) == source_bufnr then
-            vim.api.nvim_win_set_buf(win, target_bufnr)
+        if vim.api.nvim_win_get_buf(win) == sourceBufnr then
+            vim.api.nvim_win_set_buf(win, targetBufnr)
         end
     end
-    vim.schedule(function() return vim.api.nvim_buf_delete(source_bufnr, {force = true}) end)
+    vim.schedule(function() return vim.api.nvim_buf_delete(sourceBufnr, {force = true}) end)
 end
 return ____exports
  end,
@@ -2489,11 +2489,11 @@ SourceActions.SourceRemoveUnusedTs = "source.removeUnused.ts"
 SourceActions.SourceOrganizeImportsTs = "source.organizeImports.ts"
 local function makeCommand(sourceAction)
     return function(opts)
-        local client = getClient()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local client = getClient(bufnr)
         if not client then
             return
         end
-        local bufnr = vim.api.nvim_get_current_buf()
         local params = __TS__ObjectAssign(
             {},
             vim.lsp.util.make_range_params(),

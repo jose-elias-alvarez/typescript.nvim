@@ -47,7 +47,10 @@ declare namespace vim {
   const inspect: (...args: unknown[]) => void;
   const schedule: (this: void, callback: () => void) => void;
   const lsp: {
-    get_active_clients: (this: void) => NvimLsp.Client[];
+    buf_get_clients: (
+      this: void,
+      bufnr: number
+    ) => LuaTable<number, NvimLsp.Client>;
     util: {
       make_range_params: (this: void) => {
         textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;

@@ -11,8 +11,12 @@ interface Opts {
   force?: boolean;
 }
 
-const sendRequest = (source: string, target: string): boolean => {
-  const client = getClient();
+const sendRequest = (
+  sourceBufnr: number,
+  source: string,
+  target: string
+): boolean => {
+  const client = getClient(sourceBufnr);
   if (!client) {
     return false;
   }
@@ -33,8 +37,8 @@ export const renameFile = (
   target: string,
   opts?: Opts
 ): void => {
-  const source_bufnr = vim.fn.bufadd(source);
-  vim.fn.bufload(source_bufnr);
+  const sourceBufnr = vim.fn.bufadd(source);
+  vim.fn.bufload(sourceBufnr);
 
   if (util.path.exists(target) && !opts?.force) {
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
@@ -43,14 +47,14 @@ export const renameFile = (
     }
   }
 
-  const requestOk = sendRequest(source, target);
+  const requestOk = sendRequest(sourceBufnr, source, target);
   if (!requestOk) {
     print("failed to rename file: tsserver request failed");
     return;
   }
 
-  if (vim.api.nvim_buf_get_option<boolean>(source_bufnr, "modified")) {
-    vim.api.nvim_buf_call(source_bufnr, () => vim.cmd("w!"));
+  if (vim.api.nvim_buf_get_option<boolean>(sourceBufnr, "modified")) {
+    vim.api.nvim_buf_call(sourceBufnr, () => vim.cmd("w!"));
   }
   const [didRename, renameError] = vim.loop.fs_rename(source, target);
   if (!didRename) {
@@ -59,11 +63,11 @@ export const renameFile = (
     );
   }
 
-  const target_bufnr = vim.fn.bufadd(target);
+  const targetBufnr = vim.fn.bufadd(target);
   for (const win of vim.api.nvim_list_wins()) {
-    if (vim.api.nvim_win_get_buf(win) === source_bufnr) {
-      vim.api.nvim_win_set_buf(win, target_bufnr);
+    if (vim.api.nvim_win_get_buf(win) === sourceBufnr) {
+      vim.api.nvim_win_set_buf(win, targetBufnr);
     }
   }
-  vim.schedule(() => vim.api.nvim_buf_delete(source_bufnr, { force: true }));
+  vim.schedule(() => vim.api.nvim_buf_delete(sourceBufnr, { force: true }));
 };
