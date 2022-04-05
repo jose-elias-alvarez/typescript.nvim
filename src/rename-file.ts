@@ -1,6 +1,6 @@
 import { util } from "lspconfig";
 import { Methods } from "./types/methods";
-import { getClient } from "./utils";
+import { debugLog, getClient } from "./utils";
 
 interface ExecuteCommandParams {
   command: string;
@@ -47,6 +47,7 @@ export const renameFile = (
     }
   }
 
+  debugLog(`sending request to rename source ${source} to target ${target}`);
   const requestOk = sendRequest(sourceBufnr, source, target);
   if (!requestOk) {
     print("failed to rename file: tsserver request failed");

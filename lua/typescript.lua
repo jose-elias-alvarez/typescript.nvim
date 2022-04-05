@@ -2372,6 +2372,7 @@ Config.name = "Config"
 function Config.prototype.____constructor(self)
     self.disable_commands = false
     self.disable_formatting = false
+    self.debug = false
     self.server = {}
 end
 function Config.prototype.setup(self, userOpts)
@@ -2394,6 +2395,14 @@ return ____exports
 ["utils"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____config = require("config")
+local config = ____config.config
+____exports.debugLog = function(...)
+    if not config.debug then
+        return
+    end
+    print(...)
+end
 ____exports.getClient = function(bufnr)
     for ____, client in pairs(vim.lsp.buf_get_clients(bufnr)) do
         if client.name == "tsserver" then
@@ -2412,6 +2421,7 @@ local util = ____lspconfig.util
 local ____methods = require("types.methods")
 local Methods = ____methods.Methods
 local ____utils = require("utils")
+local debugLog = ____utils.debugLog
 local getClient = ____utils.getClient
 local function sendRequest(sourceBufnr, source, target)
     local client = getClient(sourceBufnr)
@@ -2446,6 +2456,7 @@ ____exports.renameFile = function(source, target, opts)
             return
         end
     end
+    debugLog((("sending request to rename source " .. source) .. " to target ") .. target)
     local requestOk = sendRequest(sourceBufnr, source, target)
     if not requestOk then
         print("failed to rename file: tsserver request failed")
@@ -2481,6 +2492,7 @@ local ____exports = {}
 local ____methods = require("types.methods")
 local Methods = ____methods.Methods
 local ____utils = require("utils")
+local debugLog = ____utils.debugLog
 local getClient = ____utils.getClient
 local SourceActions = SourceActions or ({})
 SourceActions.SourceAddMissingImportsTs = "source.addMissingImports.ts"
@@ -2503,6 +2515,10 @@ local function makeCommand(sourceAction)
             }}
         )
         local function applyEdits(res)
+            debugLog(
+                "received response:",
+                vim.inspect(res)
+            )
             local ____res__0_6 = res
             if ____res__0_6 ~= nil then
                 ____res__0_6 = ____res__0_6[1]
@@ -2524,6 +2540,10 @@ local function makeCommand(sourceAction)
             end
             vim.lsp.util.apply_text_edits(res[1].edit.documentChanges[1].edits, bufnr, client.offset_encoding)
         end
+        debugLog(
+            ("sending source action request for action " .. sourceAction) .. " with params:",
+            vim.inspect(params)
+        )
         local ____opts_sync_8 = opts
         if ____opts_sync_8 ~= nil then
             ____opts_sync_8 = ____opts_sync_8.sync

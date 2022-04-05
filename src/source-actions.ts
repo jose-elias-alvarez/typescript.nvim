@@ -1,6 +1,6 @@
 import { Diagnostic, TextDocumentEdit } from "vscode-languageserver-types";
 import { Methods } from "./types/methods";
-import { getClient } from "./utils";
+import { debugLog, getClient } from "./utils";
 
 enum SourceActions {
   SourceAddMissingImportsTs = "source.addMissingImports.ts",
@@ -42,6 +42,7 @@ const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
   };
 
   const applyEdits = function (res: Result[]) {
+    debugLog(`received response:`, vim.inspect(res));
     if (!res?.[0]?.edit?.documentChanges?.[0].edits) {
       return;
     }
@@ -53,6 +54,10 @@ const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
     );
   };
 
+  debugLog(
+    `sending source action request for action ${sourceAction} with params:`,
+    vim.inspect(params)
+  );
   if (opts?.sync) {
     const res = client.request_sync<Result, SourceActionParams>(
       Methods.CODE_ACTION,
