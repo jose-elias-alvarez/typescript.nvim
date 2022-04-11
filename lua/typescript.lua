@@ -2584,7 +2584,7 @@ ____exports.setupCommands = function(bufnr)
     if config.disable_commands then
         return
     end
-    vim.api.nvim_buf_add_user_command(
+    vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptRenameFile",
         function(opts)
@@ -2626,25 +2626,25 @@ ____exports.setupCommands = function(bufnr)
         end,
         {bang = true}
     )
-    vim.api.nvim_buf_add_user_command(
+    vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptAddMissingImports",
         function(opts) return addMissingImports({sync = opts.bang}) end,
         {bang = true}
     )
-    vim.api.nvim_buf_add_user_command(
+    vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptOrganizeImports",
         function(opts) return organizeImports({sync = opts.bang}) end,
         {bang = true}
     )
-    vim.api.nvim_buf_add_user_command(
+    vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptFixAll",
         function(opts) return fixAll({sync = opts.bang}) end,
         {bang = true}
     )
-    vim.api.nvim_buf_add_user_command(
+    vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptRemoveUnused",
         function(opts) return removeUnused({sync = opts.bang}) end,

@@ -12,7 +12,7 @@ export const setupCommands = (bufnr: number) => {
     return;
   }
 
-  vim.api.nvim_buf_add_user_command(
+  vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptRenameFile",
     (opts) => {
@@ -39,25 +39,25 @@ export const setupCommands = (bufnr: number) => {
     { bang: true }
   );
 
-  vim.api.nvim_buf_add_user_command(
+  vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptAddMissingImports",
     (opts) => addMissingImports({ sync: opts.bang }),
     { bang: true }
   );
-  vim.api.nvim_buf_add_user_command(
+  vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptOrganizeImports",
     (opts) => organizeImports({ sync: opts.bang }),
     { bang: true }
   );
-  vim.api.nvim_buf_add_user_command(
+  vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptFixAll",
     (opts) => fixAll({ sync: opts.bang }),
     { bang: true }
   );
-  vim.api.nvim_buf_add_user_command(
+  vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptRemoveUnused",
     (opts) => removeUnused({ sync: opts.bang }),

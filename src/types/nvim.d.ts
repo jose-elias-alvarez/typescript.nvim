@@ -75,7 +75,7 @@ declare namespace vim {
     nvim_get_current_buf: (this: void) => number;
     nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
     nvim_buf_get_name: (this: void, bufnr: number) => string;
-    nvim_buf_add_user_command: (
+    nvim_buf_create_user_command: (
       this: void,
       bufnr: number,
       name: string,
