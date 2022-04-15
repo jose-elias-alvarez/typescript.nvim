@@ -2440,17 +2440,12 @@ local function sendRequest(sourceBufnr, source, target)
     )
 end
 ____exports.renameFile = function(source, target, opts)
+    if opts == nil then
+        opts = {}
+    end
     local sourceBufnr = vim.fn.bufadd(source)
     vim.fn.bufload(sourceBufnr)
-    local ____util_path_exists_result_2 = util.path.exists(target)
-    if ____util_path_exists_result_2 then
-        local ____opts_force_0 = opts
-        if ____opts_force_0 ~= nil then
-            ____opts_force_0 = ____opts_force_0.force
-        end
-        ____util_path_exists_result_2 = not ____opts_force_0
-    end
-    if ____util_path_exists_result_2 then
+    if util.path.exists(target) and (opts.force == nil or opts.force == false) then
         local status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No")
         if status ~= 1 then
             return
@@ -2501,6 +2496,9 @@ SourceActions.SourceRemoveUnusedTs = "source.removeUnused.ts"
 SourceActions.SourceOrganizeImportsTs = "source.organizeImports.ts"
 local function makeCommand(sourceAction)
     return function(opts)
+        if opts == nil then
+            opts = {}
+        end
         local bufnr = vim.api.nvim_get_current_buf()
         local client = getClient(bufnr)
         if not client then
@@ -2519,23 +2517,7 @@ local function makeCommand(sourceAction)
                 "received response:",
                 vim.inspect(res)
             )
-            local ____res__0_6 = res
-            if ____res__0_6 ~= nil then
-                ____res__0_6 = ____res__0_6[1]
-            end
-            local ____res__0_edit_4 = ____res__0_6
-            if ____res__0_edit_4 ~= nil then
-                ____res__0_edit_4 = ____res__0_edit_4.edit
-            end
-            local ____res__0_edit_documentChanges_2 = ____res__0_edit_4
-            if ____res__0_edit_documentChanges_2 ~= nil then
-                ____res__0_edit_documentChanges_2 = ____res__0_edit_documentChanges_2.documentChanges
-            end
-            local ____res__0_edit_documentChanges__0_edits_0 = ____res__0_edit_documentChanges_2
-            if ____res__0_edit_documentChanges__0_edits_0 ~= nil then
-                ____res__0_edit_documentChanges__0_edits_0 = ____res__0_edit_documentChanges__0_edits_0[1].edits
-            end
-            if not ____res__0_edit_documentChanges__0_edits_0 then
+            if res[1].edit.documentChanges[1] == nil then
                 return
             end
             vim.lsp.util.apply_text_edits(res[1].edit.documentChanges[1].edits, bufnr, client.offset_encoding)
@@ -2544,11 +2526,7 @@ local function makeCommand(sourceAction)
             ("sending source action request for action " .. sourceAction) .. " with params:",
             vim.inspect(params)
         )
-        local ____opts_sync_8 = opts
-        if ____opts_sync_8 ~= nil then
-            ____opts_sync_8 = ____opts_sync_8.sync
-        end
-        if ____opts_sync_8 then
+        if opts.sync == true then
             local res = client.request_sync(Methods.CODE_ACTION, params, nil, bufnr)
             applyEdits(res.result)
         else
@@ -2598,7 +2576,7 @@ ____exports.setupCommands = function(bufnr)
                     vim.ui.input(
                         {prompt = "New path: ", default = source},
                         function(input)
-                            if not input or input == source then
+                            if input == "" or input == source then
                                 error(
                                     __TS__New(Error),
                                     0
@@ -2615,7 +2593,7 @@ ____exports.setupCommands = function(bufnr)
                     return ____returnValue
                 end
             end
-            if not target then
+            if target == "" or target == nil then
                 return
             end
             renameFile(

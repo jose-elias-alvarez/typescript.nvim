@@ -26,55 +26,57 @@ interface Opts {
   sync?: boolean;
 }
 
-const makeCommand = (sourceAction: SourceActions) => (opts?: Opts) => {
-  const bufnr = vim.api.nvim_get_current_buf();
-  const client = getClient(bufnr);
-  if (!client) {
-    return;
-  }
-
-  const params = {
-    ...vim.lsp.util.make_range_params(),
-    context: {
-      only: [sourceAction],
-      diagnostics: vim.diagnostic.get(bufnr),
-    },
-  };
-
-  const applyEdits = function (res: Result[]) {
-    debugLog(`received response:`, vim.inspect(res));
-    if (!res?.[0]?.edit?.documentChanges?.[0].edits) {
+const makeCommand =
+  (sourceAction: SourceActions) =>
+  (opts: Opts = {}) => {
+    const bufnr = vim.api.nvim_get_current_buf();
+    const client = getClient(bufnr);
+    if (!client) {
       return;
     }
 
-    vim.lsp.util.apply_text_edits(
-      res[0].edit.documentChanges[0].edits,
-      bufnr,
-      client.offset_encoding
-    );
-  };
+    const params = {
+      ...vim.lsp.util.make_range_params(),
+      context: {
+        only: [sourceAction],
+        diagnostics: vim.diagnostic.get(bufnr),
+      },
+    };
 
-  debugLog(
-    `sending source action request for action ${sourceAction} with params:`,
-    vim.inspect(params)
-  );
-  if (opts?.sync) {
-    const res = client.request_sync<Result, SourceActionParams>(
-      Methods.CODE_ACTION,
-      params,
-      undefined,
-      bufnr
+    const applyEdits = function (res: Result[]) {
+      debugLog(`received response:`, vim.inspect(res));
+      if (res[0].edit.documentChanges[0] === undefined) {
+        return;
+      }
+
+      vim.lsp.util.apply_text_edits(
+        res[0].edit.documentChanges[0].edits,
+        bufnr,
+        client.offset_encoding
+      );
+    };
+
+    debugLog(
+      `sending source action request for action ${sourceAction} with params:`,
+      vim.inspect(params)
     );
-    applyEdits(res.result);
-  } else {
-    client.request<Result, SourceActionParams>(
-      Methods.CODE_ACTION,
-      params,
-      (_, res) => applyEdits(res),
-      bufnr
-    );
-  }
-};
+    if (opts.sync === true) {
+      const res = client.request_sync<Result, SourceActionParams>(
+        Methods.CODE_ACTION,
+        params,
+        undefined,
+        bufnr
+      );
+      applyEdits(res.result);
+    } else {
+      client.request<Result, SourceActionParams>(
+        Methods.CODE_ACTION,
+        params,
+        (_, res) => applyEdits(res),
+        bufnr
+      );
+    }
+  };
 
 export const addMissingImports = makeCommand(
   SourceActions.SourceAddMissingImportsTs

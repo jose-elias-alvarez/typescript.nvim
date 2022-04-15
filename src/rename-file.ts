@@ -35,12 +35,15 @@ const sendRequest = (
 export const renameFile = (
   source: string,
   target: string,
-  opts?: Opts
+  opts: Opts = {}
 ): void => {
   const sourceBufnr = vim.fn.bufadd(source);
   vim.fn.bufload(sourceBufnr);
 
-  if (util.path.exists(target) && !opts?.force) {
+  if (
+    util.path.exists(target) &&
+    (opts.force === undefined || opts.force === false)
+  ) {
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
     if (status !== 1) {
       return;

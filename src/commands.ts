@@ -20,7 +20,7 @@ export const setupCommands = (bufnr: number) => {
       let target: string | undefined;
       try {
         vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
-          if (!input || input === source) {
+          if (input === "" || input === source) {
             throw new Error();
           }
           target = input;
@@ -28,7 +28,7 @@ export const setupCommands = (bufnr: number) => {
       } catch (_) {
         return;
       }
-      if (!target) {
+      if (target === "" || target === undefined) {
         return;
       }
 
