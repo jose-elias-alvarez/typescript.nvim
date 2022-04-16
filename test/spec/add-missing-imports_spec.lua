@@ -24,5 +24,14 @@ const notification: UserNotification = { user: testUser, content: "hello" };
 
             assert_final()
         end)
+
+        it("does nothing when file has no missing imports", function()
+            local assert_final = test_utils.setup_test_file("add-missing-imports", final, final)
+
+            local _, err = pcall(require("typescript").actions.addMissingImports, { sync = true })
+
+            assert_final()
+            assert.falsy(err)
+        end)
     end)
 end)
