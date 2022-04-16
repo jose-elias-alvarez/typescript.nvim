@@ -2517,7 +2517,23 @@ local function makeCommand(sourceAction)
                 "received response:",
                 vim.inspect(res)
             )
-            if res[1].edit.documentChanges[1] == nil then
+            local ____res__0_edit_6 = res[1]
+            if ____res__0_edit_6 ~= nil then
+                ____res__0_edit_6 = ____res__0_edit_6.edit
+            end
+            local ____res__0_edit_documentChanges_4 = ____res__0_edit_6
+            if ____res__0_edit_documentChanges_4 ~= nil then
+                ____res__0_edit_documentChanges_4 = ____res__0_edit_documentChanges_4.documentChanges
+            end
+            local ____res__0_edit_documentChanges__0_2 = ____res__0_edit_documentChanges_4
+            if ____res__0_edit_documentChanges__0_2 ~= nil then
+                ____res__0_edit_documentChanges__0_2 = ____res__0_edit_documentChanges__0_2[1]
+            end
+            local ____res__0_edit_documentChanges__0_edits_0 = ____res__0_edit_documentChanges__0_2
+            if ____res__0_edit_documentChanges__0_edits_0 ~= nil then
+                ____res__0_edit_documentChanges__0_edits_0 = ____res__0_edit_documentChanges__0_edits_0.edits
+            end
+            if ____res__0_edit_documentChanges__0_edits_0 == nil then
                 return
             end
             vim.lsp.util.apply_text_edits(res[1].edit.documentChanges[1].edits, bufnr, client.offset_encoding)

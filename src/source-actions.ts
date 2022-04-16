@@ -17,8 +17,8 @@ interface SourceActionParams extends NvimLsp.RangeParams {
 }
 
 interface Result {
-  edit: {
-    documentChanges: TextDocumentEdit[];
+  edit?: {
+    documentChanges?: TextDocumentEdit[];
   };
 }
 
@@ -45,7 +45,7 @@ const makeCommand =
 
     const applyEdits = function (res: Result[]) {
       debugLog(`received response:`, vim.inspect(res));
-      if (res[0].edit.documentChanges[0] === undefined) {
+      if (res[0]?.edit?.documentChanges?.[0]?.edits === undefined) {
         return;
       }
 
