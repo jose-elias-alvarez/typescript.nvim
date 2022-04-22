@@ -29,11 +29,20 @@ require("typescript").setup({
 })
 ```
 
+**Note:** if you have `require("lspconfig").setup({})` anywhere in your config,
+make sure to remove it and pass any options you were using under the `server`
+key. lspconfig doesn't allow more than one setup call, so your config will not
+work as expected.
+
 ## Features
 
-The plugin exposes its functionality via Vim commands as well as a Lua API. The
-following commands are async by default, but you can make them run synchronously
-by adding a `!` to Vim commands or passing `{ sync = true }` to Lua commands.
+The plugin exposes its functionality via Vim commands as well as a Lua API. Vim
+commands are buffer-local, so you'll have access to them once `tsserver` has
+attached.
+
+The following commands are async by default, but you can make them run
+synchronously by adding a `!` to Vim commands or passing `{ sync = true }` to
+Lua commands.
 
 - Add missing imports: `:TypescriptAddMissingImports` /
   `require("typescript").addMissingImports()`
@@ -58,7 +67,7 @@ by adding a `!` to Vim commands or passing `{ sync = true }` to Lua commands.
 
 ## Not yet implemented
 
-- Inlay hints
+- Inlay hints (waiting for [upstream support](https://github.com/neovim/neovim/issues/18086))
 
 ## Will not implement
 
