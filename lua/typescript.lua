@@ -2590,6 +2590,7 @@ ____exports.renameFile = function(source, target, opts)
     if util.path.exists(target) and (opts.force == nil or opts.force == false) then
         local status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No")
         if status ~= 1 then
+            debugLog("user declined to overrwrite file; aborting")
             return
         end
     end
@@ -2611,6 +2612,8 @@ ____exports.renameFile = function(source, target, opts)
             __TS__New(Error, (((("failed to move " .. source) .. " to ") .. target) .. ": ") .. renameError),
             0
         )
+    else
+        debugLog((("successfully renamed source " .. source) .. " to target ") .. target)
     end
     local targetBufnr = vim.fn.bufadd(target)
     for ____, win in ipairs(vim.api.nvim_list_wins()) do

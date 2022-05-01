@@ -46,6 +46,7 @@ export const renameFile = (
   ) {
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
     if (status !== 1) {
+      debugLog("user declined to overrwrite file; aborting");
       return;
     }
   }
@@ -65,6 +66,8 @@ export const renameFile = (
     throw new Error(
       `failed to move ${source} to ${target}: ${renameError as string}`
     );
+  } else {
+    debugLog(`successfully renamed source ${source} to target ${target}`);
   }
 
   const targetBufnr = vim.fn.bufadd(target);
