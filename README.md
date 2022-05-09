@@ -83,3 +83,10 @@ Lua commands.
 Integration tests are in Lua and depend on
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim). Run `make test` from
 the root of the repo.
+
+## Sponsors
+
+Thanks to everyone who sponsors my projects and makes continued development /
+maintenance possible!
+
+<!-- sponsors --><!-- sponsors -->
