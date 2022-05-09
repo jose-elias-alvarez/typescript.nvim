@@ -89,4 +89,4 @@ the root of the repo.
 Thanks to everyone who sponsors my projects and makes continued development /
 maintenance possible!
 
-<!-- sponsors --><!-- sponsors -->
+<!-- sponsors --><a href="https://github.com/yutkat"><img src="https://github.com/yutkat.png" width="60px" alt="" /></a><a href="https://github.com/hituzi-no-sippo"><img src="https://github.com/hituzi-no-sippo.png" width="60px" alt="" /></a><a href="https://github.com/sbc64"><img src="https://github.com/sbc64.png" width="60px" alt="" /></a><a href="https://github.com/milanglacier"><img src="https://github.com/milanglacier.png" width="60px" alt="" /></a><!-- sponsors -->
