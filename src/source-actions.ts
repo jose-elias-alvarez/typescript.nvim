@@ -24,12 +24,13 @@ interface Result {
 
 interface Opts {
   sync?: boolean;
+  bufnr?: number;
 }
 
 const makeCommand =
   (sourceAction: SourceActions) =>
   (opts: Opts = {}) => {
-    const bufnr = vim.api.nvim_get_current_buf();
+    const bufnr = opts.bufnr ?? vim.api.nvim_get_current_buf();
     const client = getClient(bufnr);
     if (!client) {
       return;

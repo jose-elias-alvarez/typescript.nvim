@@ -2644,7 +2644,7 @@ local function makeCommand(sourceAction)
         if opts == nil then
             opts = {}
         end
-        local bufnr = vim.api.nvim_get_current_buf()
+        local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
         local client = getClient(bufnr)
         if not client then
             return
