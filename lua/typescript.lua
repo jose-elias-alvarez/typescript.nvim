@@ -2707,14 +2707,7 @@ ____exports.removeUnused = makeCommand(SourceActions.SourceRemoveUnusedTs)
 return ____exports
  end,
 ["commands"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____config = require("config")
 local config = ____config.config
@@ -2734,39 +2727,14 @@ ____exports.setupCommands = function(bufnr)
         "TypescriptRenameFile",
         function(opts)
             local source = vim.api.nvim_buf_get_name(0)
-            local target
-            do
-                local function ____catch(_)
-                    return true
+            vim.ui.input(
+                {prompt = "New path: ", default = source},
+                function(input)
+                    if input == "" or input == source or input == nil then
+                        return
+                    end
+                    renameFile(source, input, {force = opts.bang})
                 end
-                local ____try, ____hasReturned, ____returnValue = pcall(function()
-                    vim.ui.input(
-                        {prompt = "New path: ", default = source},
-                        function(input)
-                            if input == "" or input == source then
-                                error(
-                                    __TS__New(Error),
-                                    0
-                                )
-                            end
-                            target = input
-                        end
-                    )
-                end)
-                if not ____try then
-                    ____hasReturned, ____returnValue = ____catch(____hasReturned)
-                end
-                if ____hasReturned then
-                    return ____returnValue
-                end
-            end
-            if target == "" or target == nil then
-                return
-            end
-            renameFile(
-                vim.api.nvim_buf_get_name(0),
-                target,
-                {force = opts.bang}
             )
         end,
         {bang = true}

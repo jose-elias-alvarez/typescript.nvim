@@ -17,23 +17,13 @@ export const setupCommands = (bufnr: number) => {
     "TypescriptRenameFile",
     (opts) => {
       const source = vim.api.nvim_buf_get_name(0);
-      let target: string | undefined;
-      try {
-        vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
-          if (input === "" || input === source) {
-            throw new Error();
-          }
-          target = input;
+      vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
+        if (input === "" || input === source || input === undefined) {
+          return;
+        }
+        renameFile(source, input, {
+          force: opts.bang,
         });
-      } catch (_) {
-        return;
-      }
-      if (target === "" || target === undefined) {
-        return;
-      }
-
-      renameFile(vim.api.nvim_buf_get_name(0), target, {
-        force: opts.bang,
       });
     },
     { bang: true }
