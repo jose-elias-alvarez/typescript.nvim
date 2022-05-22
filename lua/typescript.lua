@@ -2707,14 +2707,7 @@ ____exports.removeUnused = makeCommand(SourceActions.SourceRemoveUnusedTs)
 return ____exports
  end,
 ["commands"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____config = require("config")
 local config = ____config.config
@@ -2738,10 +2731,7 @@ ____exports.setupCommands = function(bufnr)
                 {prompt = "New path: ", default = source},
                 function(input)
                     if input == "" or input == source or input == nil then
-                        error(
-                            __TS__New(Error),
-                            0
-                        )
+                        return
                     end
                     renameFile(source, input, {force = opts.bang})
                 end

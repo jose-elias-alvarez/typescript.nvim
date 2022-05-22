@@ -19,7 +19,7 @@ export const setupCommands = (bufnr: number) => {
       const source = vim.api.nvim_buf_get_name(0);
       vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
         if (input === "" || input === source || input === undefined) {
-          throw new Error();
+          return;
         }
         renameFile(source, input, {
           force: opts.bang,
