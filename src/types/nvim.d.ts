@@ -8,9 +8,15 @@ declare namespace NvimLsp {
 
   interface Client {
     name: string;
+    // neovim 0.7
     resolved_capabilities: {
       document_formatting: boolean;
       document_range_formatting: boolean;
+    };
+    // neovim 0.8
+    server_capabilities: {
+      documentFormattingProvider: boolean;
+      documentRangeFormattingProvider: boolean;
     };
     offset_encoding: string;
     request: <T, U = Record<string, unknown>>(
@@ -103,6 +109,7 @@ declare namespace vim {
     confirm: (this: void, message: string, choices: string) => 0 | 1;
     bufadd: (this: void, bufname: string) => number;
     bufload: (this: void, bufnr: number) => void;
+    has: (this: void, feature: string) => 0 | 1;
   };
   const cmd: (this: void, command: string) => void;
   const uri_from_fname: (this: void, fname: string) => string;

@@ -8,8 +8,13 @@ export const setupLsp = (overrides?: ConfigOptions) => {
 
   resolvedConfig.server.on_init = (client, initialize_result) => {
     if (resolvedConfig.disable_formatting) {
-      client.resolved_capabilities.document_formatting = false;
-      client.resolved_capabilities.document_range_formatting = false;
+      if (vim.fn.has("nvim-0.8") === 1) {
+        client.server_capabilities.documentFormattingProvider = false;
+        client.server_capabilities.documentRangeFormattingProvider = false;
+      } else {
+        client.resolved_capabilities.document_formatting = false;
+        client.resolved_capabilities.document_range_formatting = false;
+      }
     }
 
     on_init?.(client, initialize_result);
