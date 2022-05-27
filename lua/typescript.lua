@@ -2507,7 +2507,6 @@ local Config = __TS__Class()
 Config.name = "Config"
 function Config.prototype.____constructor(self)
     self.disable_commands = false
-    self.disable_formatting = false
     self.debug = false
     self.server = {}
 end
@@ -2782,15 +2781,6 @@ ____exports.setupLsp = function(overrides)
     local on_init = ____resolvedConfig_server_0.on_init
     local on_attach = ____resolvedConfig_server_0.on_attach
     resolvedConfig.server.on_init = function(client, initialize_result)
-        if resolvedConfig.disable_formatting then
-            if vim.fn.has("nvim-0.8") == 1 then
-                client.server_capabilities.documentFormattingProvider = false
-                client.server_capabilities.documentRangeFormattingProvider = false
-            else
-                client.resolved_capabilities.document_formatting = false
-                client.resolved_capabilities.document_range_formatting = false
-            end
-        end
         local ____on_init_result_1 = on_init
         if ____on_init_result_1 ~= nil then
             ____on_init_result_1 = ____on_init_result_1(client, initialize_result)
