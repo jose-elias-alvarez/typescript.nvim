@@ -21,12 +21,24 @@ const notification: UserNotification = { content: "hi", user };
 console.log(notification);
         ]]
 
-        it("organizes out-of-order imports", function()
-            local assert_final = test_utils.setup_test_file("organize-imports", content, final)
+        describe("Lua API", function()
+            it("organizes out-of-order imports", function()
+                local assert_final = test_utils.setup_test_file("organize-imports", content, final)
 
-            require("typescript").actions.organizeImports({ sync = true })
+                require("typescript").actions.organizeImports({ sync = true })
 
-            assert_final()
+                assert_final()
+            end)
+        end)
+
+        describe("Vim command", function()
+            it("organizes out-of-order imports", function()
+                local assert_final = test_utils.setup_test_file("organize-imports", content, final)
+
+                vim.cmd("TypescriptOrganizeImports!")
+
+                assert_final()
+            end)
         end)
     end)
 end)
