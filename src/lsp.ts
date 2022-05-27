@@ -11,7 +11,9 @@ export const setupLsp = (overrides?: ConfigOptions) => {
   };
 
   resolvedConfig.server.on_attach = (client, bufnr) => {
-    setupCommands(bufnr);
+    if (!config.disable_commands) {
+      setupCommands(bufnr);
+    }
 
     on_attach?.(client, bufnr);
   };

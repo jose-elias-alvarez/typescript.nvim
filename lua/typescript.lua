@@ -2497,6 +2497,14 @@ return {
   __TS__Unpack = __TS__Unpack
 }
  end,
+["types.methods"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports.Methods = Methods or ({})
+____exports.Methods.CODE_ACTION = "textDocument/codeAction"
+____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
+return ____exports
+ end,
 ["config"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -2517,14 +2525,6 @@ ____exports.config = __TS__New(Config)
 ____exports.setupConfig = function(userOpts)
     ____exports.config:setup(userOpts)
 end
-return ____exports
- end,
-["types.methods"] = function(...) 
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-local ____exports = {}
-____exports.Methods = Methods or ({})
-____exports.Methods.CODE_ACTION = "textDocument/codeAction"
-____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
 return ____exports
  end,
 ["utils"] = function(...) 
@@ -2708,8 +2708,6 @@ return ____exports
 ["commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____config = require("config")
-local config = ____config.config
 local ____rename_2Dfile = require("rename-file")
 local renameFile = ____rename_2Dfile.renameFile
 local ____source_2Dactions = require("source-actions")
@@ -2718,9 +2716,6 @@ local fixAll = ____source_2Dactions.fixAll
 local organizeImports = ____source_2Dactions.organizeImports
 local removeUnused = ____source_2Dactions.removeUnused
 ____exports.setupCommands = function(bufnr)
-    if config.disable_commands then
-        return
-    end
     vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptRenameFile",
@@ -2787,7 +2782,9 @@ ____exports.setupLsp = function(overrides)
         end
     end
     resolvedConfig.server.on_attach = function(client, bufnr)
-        setupCommands(bufnr)
+        if not config.disable_commands then
+            setupCommands(bufnr)
+        end
         local ____on_attach_result_3 = on_attach
         if ____on_attach_result_3 ~= nil then
             ____on_attach_result_3 = ____on_attach_result_3(client, bufnr)
