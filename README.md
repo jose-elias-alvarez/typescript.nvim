@@ -44,15 +44,15 @@ synchronously by adding a `!` to Vim commands or passing `{ sync = true }` to
 Lua commands.
 
 - Add missing imports: `:TypescriptAddMissingImports` /
-  `require("typescript").addMissingImports()`
+  `require("typescript").actions.addMissingImports()`
 
 - Organize imports: `:TypescriptOrganizeImports` /
-  `require("typescript").organizeImports()`
+  `require("typescript").actions.organizeImports()`
 
 - Remove unused variables: `:TypescriptRemoveUnused` /
-  `require("typescript").removeUnused()`
+  `require("typescript").actions.removeUnused()`
 
-- Fix all: `:TypescriptFixAll` / `require("typescript").fixAll()`
+- Fix all: `:TypescriptFixAll` / `require("typescript").actions.fixAll()`
 
   Despite the name, this command fixes a handful of specific issues, most notably
   non-async functions that use `await` and unreachable code.
