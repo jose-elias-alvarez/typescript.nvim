@@ -2615,6 +2615,7 @@ ____exports.renameFile = function(source, target, opts)
         debugLog((("successfully renamed source " .. source) .. " to target ") .. target)
     end
     local targetBufnr = vim.fn.bufadd(target)
+    vim.api.nvim_buf_set_option(targetBufnr, "buflisted", true)
     for ____, win in ipairs(vim.api.nvim_list_wins()) do
         if vim.api.nvim_win_get_buf(win) == sourceBufnr then
             vim.api.nvim_win_set_buf(win, targetBufnr)
