@@ -71,7 +71,7 @@ export const renameFile = (
   }
 
   const targetBufnr = vim.fn.bufadd(target);
-  vim.api.nvim_buf_set_option(targetBufnr, "buflisted", true)
+  vim.api.nvim_buf_set_option(targetBufnr, "buflisted", true);
   for (const win of vim.api.nvim_list_wins()) {
     if (vim.api.nvim_win_get_buf(win) === sourceBufnr) {
       vim.api.nvim_win_set_buf(win, targetBufnr);

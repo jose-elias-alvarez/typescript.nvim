@@ -97,7 +97,13 @@ declare namespace vim {
     nvim_list_wins: (this: void) => number[];
     nvim_win_get_buf: (this: void, win: number) => number;
     nvim_win_set_buf: (this: void, win: number, bufnr: number) => void;
-    nvim_buf_set_option: (this: void, buffer: number, name: string, value: any) => void;
+    nvim_buf_set_option: (
+      this: void,
+      buffer: number,
+      name: string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      value: any
+    ) => void;
   };
   const ui: {
     input: (
