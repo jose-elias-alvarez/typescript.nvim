@@ -35,9 +35,10 @@ work as expected.
 
 ## Features
 
-The plugin exposes its functionality via Vim commands as well as a Lua API. Vim
-commands are buffer-local, so you'll have access to them once `tsserver` has
-attached.
+### Commands
+
+The plugin exposes Vim commands as well as a Lua API. Vim commands are
+buffer-local, so you'll have access to them once `tsserver` has attached.
 
 The following commands are async by default, but you can make them run
 synchronously by adding a `!` to Vim commands or passing `{ sync = true }` to
@@ -64,11 +65,19 @@ Lua commands.
   the current buffer and prompt for a rename target, while the Lua version
   requires specifying the full path to a `source` and `target`.
 
+### Handlers
+
+The plugin defines handlers for off-spec methods that are not otherwise
+supported by Neovim.
+
+- `_typescript.rename`: invoked after certain code actions (e.g. when extracting
+  a function to local / global scope).
+
 ## Not yet implemented
 
 - Inlay hints (waiting for [upstream support](https://github.com/neovim/neovim/issues/18086))
 
-## Will not implement
+## Will not support
 
 - Anything not supported by `typescript-language-server` itself
 

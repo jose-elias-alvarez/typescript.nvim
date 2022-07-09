@@ -2503,6 +2503,8 @@ local ____exports = {}
 ____exports.Methods = Methods or ({})
 ____exports.Methods.CODE_ACTION = "textDocument/codeAction"
 ____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
+____exports.TypescriptMethods = TypescriptMethods or ({})
+____exports.TypescriptMethods.RENAME = "_typescript.rename"
 return ____exports
  end,
 ["config"] = function(...) 
@@ -2761,6 +2763,33 @@ ____exports.setupCommands = function(bufnr)
 end
 return ____exports
  end,
+["handlers"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local function isRenameResult(res)
+    return type(res) == "table" and res.position ~= nil
+end
+local function renameHandler(_err, res)
+    if not isRenameResult(res) then
+        return
+    end
+    local bufnr = 0
+    local win = 0
+    local ____res_position_0 = res.position
+    local line = ____res_position_0.line
+    local character = ____res_position_0.character
+    local col = vim.str_byteindex(
+        vim.api.nvim_buf_get_lines(bufnr, line, line + 1, true)[1],
+        character,
+        true
+    )
+    vim.api.nvim_win_set_cursor(win, {line + 1, col})
+    vim.lsp.buf.rename()
+    return res
+end
+____exports.renameHandler = renameHandler
+return ____exports
+ end,
 ["lsp"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
@@ -2771,11 +2800,16 @@ local ____commands = require("commands")
 local setupCommands = ____commands.setupCommands
 local ____config = require("config")
 local config = ____config.config
+local ____handlers = require("handlers")
+local renameHandler = ____handlers.renameHandler
+local ____methods = require("types.methods")
+local TypescriptMethods = ____methods.TypescriptMethods
 ____exports.setupLsp = function(overrides)
     local resolvedConfig = __TS__ObjectAssign({}, config, overrides or ({}))
     local ____resolvedConfig_server_0 = resolvedConfig.server
     local on_init = ____resolvedConfig_server_0.on_init
     local on_attach = ____resolvedConfig_server_0.on_attach
+    local handlers = ____resolvedConfig_server_0.handlers
     resolvedConfig.server.on_init = function(client, initialize_result)
         local ____on_init_result_1 = on_init
         if ____on_init_result_1 ~= nil then
@@ -2791,6 +2825,14 @@ ____exports.setupLsp = function(overrides)
             ____on_attach_result_3 = ____on_attach_result_3(client, bufnr)
         end
     end
+    local ____resolvedConfig_server_9 = resolvedConfig.server
+    local ____temp_7 = handlers or ({})
+    local ____TypescriptMethods_RENAME_8 = TypescriptMethods.RENAME
+    local ____handlers_TypescriptMethods_RENAME_5 = handlers
+    if ____handlers_TypescriptMethods_RENAME_5 ~= nil then
+        ____handlers_TypescriptMethods_RENAME_5 = ____handlers_TypescriptMethods_RENAME_5[TypescriptMethods.RENAME]
+    end
+    ____resolvedConfig_server_9.handlers = __TS__ObjectAssign({}, ____temp_7, {[____TypescriptMethods_RENAME_8] = ____handlers_TypescriptMethods_RENAME_5 or renameHandler})
     tsserver.setup(resolvedConfig.server)
 end
 return ____exports

@@ -34,9 +34,23 @@ declare namespace NvimLsp {
       bufnr?: number
     ) => { result: T[] };
   }
+
+  // used in vim.lsp.buf.* callbacks to filter clients
+  type ClientFilter = (this: void, client: Client) => boolean;
+
+  type Handler = (
+    this: void,
+    err: unknown,
+    res: unknown,
+    params: unknown
+  ) => typeof res;
+
   interface ServerOptions {
     on_attach?: (this: void, client: Client, bufnr: number) => void;
     on_init?: (this: void, client: Client, initialize_result: unknown) => void;
+    handlers?: {
+      [key in import("./methods").TypescriptMethods]: Handler;
+    };
   }
 }
 
@@ -70,6 +84,13 @@ declare namespace vim {
         offset_encoding: string
       ) => void;
     };
+    buf: {
+      rename: (
+        this: void,
+        newName?: string,
+        options?: { filter?: NvimLsp.ClientFilter; name?: string }
+      ) => void;
+    };
   };
   const diagnostic: {
     get: (
@@ -80,6 +101,13 @@ declare namespace vim {
   const api: {
     nvim_get_current_buf: (this: void) => number;
     nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
+    nvim_buf_get_lines: (
+      this: void,
+      bufnr: number,
+      start: number,
+      end: number,
+      strictIndexing: boolean
+    ) => string[];
     nvim_buf_get_name: (this: void, bufnr: number) => string;
     nvim_buf_create_user_command: (
       this: void,
@@ -97,6 +125,11 @@ declare namespace vim {
     nvim_list_wins: (this: void) => number[];
     nvim_win_get_buf: (this: void, win: number) => number;
     nvim_win_set_buf: (this: void, win: number, bufnr: number) => void;
+    nvim_win_set_cursor: (
+      this: void,
+      win: number,
+      pos: [row: number, col: number]
+    ) => void;
     nvim_buf_set_option: (
       this: void,
       buffer: number,
@@ -127,4 +160,10 @@ declare namespace vim {
       target: string
     ) => LuaMultiReturn<[boolean, string | undefined]>;
   };
+  const str_byteindex: (
+    this: void,
+    str: string,
+    index: number,
+    useUtf16?: boolean
+  ) => number;
 }
