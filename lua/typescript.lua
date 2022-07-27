@@ -368,7 +368,11 @@ end
 
 local function __TS__ArraySlice(self, first, last)
     local len = #self
-    first = first or 0
+    local ____first_0 = first
+    if ____first_0 == nil then
+        ____first_0 = 0
+    end
+    first = ____first_0
     if first < 0 then
         first = len + first
         if first < 0 then
@@ -379,7 +383,11 @@ local function __TS__ArraySlice(self, first, last)
             first = len
         end
     end
-    last = last or len
+    local ____last_1 = last
+    if ____last_1 == nil then
+        ____last_1 = len
+    end
+    last = ____last_1
     if last < 0 then
         last = len + last
         if last < 0 then
@@ -435,7 +443,11 @@ local function __TS__ArraySplice(self, ...)
     elseif actualArgumentCount == 1 then
         actualDeleteCount = len - start
     else
-        actualDeleteCount = deleteCount or 0
+        local ____deleteCount_0 = deleteCount
+        if ____deleteCount_0 == nil then
+            ____deleteCount_0 = 0
+        end
+        actualDeleteCount = ____deleteCount_0
         if actualDeleteCount < 0 then
             actualDeleteCount = 0
         end
@@ -674,7 +686,7 @@ do
             end
         else
             local ____self_fulfilledCallbacks_2 = self.fulfilledCallbacks
-            ____self_fulfilledCallbacks_2[#____self_fulfilledCallbacks_2 + 1] = function() return resolve(nil, nil) end
+            ____self_fulfilledCallbacks_2[#____self_fulfilledCallbacks_2 + 1] = function(____, v) return resolve(nil, v) end
         end
         if onRejected then
             local internalCallback = self:createPromiseResolvingCallback(onRejected, resolve, reject)
@@ -683,6 +695,9 @@ do
             if isRejected then
                 internalCallback(nil, self.rejectionReason)
             end
+        else
+            local ____self_rejectedCallbacks_4 = self.rejectedCallbacks
+            ____self_rejectedCallbacks_4[#____self_rejectedCallbacks_4 + 1] = function(____, err) return reject(nil, err) end
         end
         if isFulfilled then
             resolve(nil, self.value)
@@ -697,8 +712,8 @@ do
     end
     function __TS__Promise.prototype.finally(self, onFinally)
         if onFinally then
-            local ____self_finallyCallbacks_4 = self.finallyCallbacks
-            ____self_finallyCallbacks_4[#____self_finallyCallbacks_4 + 1] = onFinally
+            local ____self_finallyCallbacks_5 = self.finallyCallbacks
+            ____self_finallyCallbacks_5[#____self_finallyCallbacks_5 + 1] = onFinally
             if self.state ~= 0 then
                 onFinally(nil)
             end
@@ -776,7 +791,7 @@ local function __TS__AsyncAwaiter(generator)
     return __TS__New(
         __TS__Promise,
         function(____, resolve, reject)
-            local adopt, fulfilled, rejected, step, asyncCoroutine
+            local adopt, fulfilled, step, resolved, asyncCoroutine
             function adopt(self, value)
                 local ____temp_0
                 if __TS__InstanceOf(value, __TS__Promise) then
@@ -787,57 +802,44 @@ local function __TS__AsyncAwaiter(generator)
                 return ____temp_0
             end
             function fulfilled(self, value)
-                local success, errorOrErrorHandler, resultOrError = coroutine.resume(asyncCoroutine, value)
+                local success, resultOrError = coroutine.resume(asyncCoroutine, value)
                 if success then
-                    step(nil, resultOrError, errorOrErrorHandler)
+                    step(nil, resultOrError)
                 else
-                    reject(nil, errorOrErrorHandler)
+                    reject(nil, resultOrError)
                 end
             end
-            function rejected(self, handler)
-                if handler then
-                    return function(____, value)
-                        local success, hasReturnedOrError, returnedValue = pcall(handler, value)
-                        if success then
-                            if hasReturnedOrError then
-                                resolve(nil, returnedValue)
-                            else
-                                step(nil, hasReturnedOrError, handler)
-                            end
-                        else
-                            reject(nil, hasReturnedOrError)
-                        end
-                    end
-                else
-                    return function(____, value)
-                        reject(nil, value)
-                    end
+            function step(self, result)
+                if resolved then
+                    return
                 end
-            end
-            function step(self, result, errorHandler)
                 if coroutine.status(asyncCoroutine) == "dead" then
                     resolve(nil, result)
                 else
                     local ____self_1 = adopt(nil, result)
-                    ____self_1["then"](
-                        ____self_1,
-                        fulfilled,
-                        rejected(nil, errorHandler)
-                    )
+                    ____self_1["then"](____self_1, fulfilled, reject)
                 end
             end
+            resolved = false
             asyncCoroutine = coroutine.create(generator)
-            local success, errorOrErrorHandler, resultOrError = coroutine.resume(asyncCoroutine)
+            local success, resultOrError = coroutine.resume(
+                asyncCoroutine,
+                function(____, v)
+                    resolved = true
+                    local ____self_2 = adopt(nil, v)
+                    ____self_2["then"](____self_2, resolve, reject)
+                end
+            )
             if success then
-                step(nil, resultOrError, errorOrErrorHandler)
+                step(nil, resultOrError)
             else
-                reject(nil, errorOrErrorHandler)
+                reject(nil, resultOrError)
             end
         end
     )
 end
-local function __TS__Await(errorHandler, thing)
-    return coroutine.yield(errorHandler, thing)
+local function __TS__Await(thing)
+    return coroutine.yield(thing)
 end
 
 local function __TS__ClassExtends(target, base)
@@ -1208,7 +1210,14 @@ do
             local args = {...}
             local argsLength = select("#", ...)
             return {
-                ____coroutine = coroutine.create(function() return fn((unpack or table.unpack)(args, 1, argsLength)) end),
+                ____coroutine = coroutine.create(function()
+                    local ____fn_1 = fn
+                    local ____unpack_0 = unpack
+                    if ____unpack_0 == nil then
+                        ____unpack_0 = table.unpack
+                    end
+                    return ____fn_1(____unpack_0(args, 1, argsLength))
+                end),
                 [Symbol.iterator] = generatorIterator,
                 next = generatorNext
             }
@@ -1316,9 +1325,8 @@ do
         return self:entries()
     end
     function Map.prototype.entries(self)
-        local ____temp_0 = self
-        local items = ____temp_0.items
-        local nextKey = ____temp_0.nextKey
+        local items = self.items
+        local nextKey = self.nextKey
         local key = self.firstKey
         return {
             [Symbol.iterator] = function(self)
@@ -1346,9 +1354,8 @@ do
         }
     end
     function Map.prototype.values(self)
-        local ____temp_1 = self
-        local items = ____temp_1.items
-        local nextKey = ____temp_1.nextKey
+        local items = self.items
+        local nextKey = self.nextKey
         local key = self.firstKey
         return {
             [Symbol.iterator] = function(self)
@@ -1588,7 +1595,11 @@ local function __TS__ParseFloat(numberString)
         return ____temp_0
     end
     local number = tonumber(string.match(numberString, "^%s*(-?%d+%.?%d*)"))
-    return number or 0 / 0
+    local ____number_1 = number
+    if ____number_1 == nil then
+        ____number_1 = 0 / 0
+    end
+    return ____number_1
 end
 
 local function __TS__StringSubstr(self, from, length)
@@ -1982,7 +1993,11 @@ local function __TS__SparseArrayPush(sparseArray, ...)
 end
 
 local function __TS__SparseArraySpread(sparseArray)
-    local _unpack = unpack or table.unpack
+    local ____unpack_0 = unpack
+    if ____unpack_0 == nil then
+        ____unpack_0 = table.unpack
+    end
+    local _unpack = ____unpack_0
     return _unpack(sparseArray, 1, sparseArray.sparseLength)
 end
 
@@ -2106,10 +2121,23 @@ local function __TS__SourceMapTraceBack(fileName, sourceMap)
                 "(%S+)%.lua:(%d+)",
                 function(file, line) return replacer(nil, file .. ".lua", file .. ".ts", line) end
             )
+            local function stringReplacer(____, file, line)
+                local fileSourceMap = _G.__TS__sourcemap[file]
+                if fileSourceMap and fileSourceMap[line] then
+                    local chunkName = string.match(file, "%[string \"([^\"]+)\"%]")
+                    local sourceName = string.gsub(chunkName, ".lua$", ".ts")
+                    local data = fileSourceMap[line]
+                    if type(data) == "number" then
+                        return (sourceName .. ":") .. tostring(data)
+                    end
+                    return (tostring(data.file) .. ":") .. tostring(data.line)
+                end
+                return (file .. ":") .. line
+            end
             result = string.gsub(
                 result,
                 "(%[string \"[^\"]+\"%]):(%d+)",
-                function(file, line) return replacer(nil, file, "unknown", line) end
+                function(file, line) return stringReplacer(nil, file, line) end
             )
             return result
         end
@@ -2149,7 +2177,11 @@ local function __TS__StringCharCodeAt(self, index)
     if index < 0 then
         return 0 / 0
     end
-    return string.byte(self, index + 1) or 0 / 0
+    local ____string_byte_result_0 = string.byte(self, index + 1)
+    if ____string_byte_result_0 == nil then
+        ____string_byte_result_0 = 0 / 0
+    end
+    return ____string_byte_result_0
 end
 
 local function __TS__StringEndsWith(self, searchString, endPosition)
@@ -2518,7 +2550,7 @@ Config.name = "Config"
 function Config.prototype.____constructor(self)
     self.disable_commands = false
     self.debug = false
-    self.server = {}
+    self.server = {init_options = {hostInfo = "neovim"}}
 end
 function Config.prototype.setup(self, userOpts)
     __TS__ObjectAssign(self, userOpts)
@@ -2810,6 +2842,7 @@ ____exports.setupLsp = function(overrides)
     local on_init = ____resolvedConfig_server_0.on_init
     local on_attach = ____resolvedConfig_server_0.on_attach
     local handlers = ____resolvedConfig_server_0.handlers
+    local init_options = ____resolvedConfig_server_0.init_options
     resolvedConfig.server.on_init = function(client, initialize_result)
         local ____on_init_result_1 = on_init
         if ____on_init_result_1 ~= nil then
@@ -2833,6 +2866,16 @@ ____exports.setupLsp = function(overrides)
         ____handlers_TypescriptMethods_RENAME_5 = ____handlers_TypescriptMethods_RENAME_5[TypescriptMethods.RENAME]
     end
     ____resolvedConfig_server_9.handlers = __TS__ObjectAssign({}, ____temp_7, {[____TypescriptMethods_RENAME_8] = ____handlers_TypescriptMethods_RENAME_5 or renameHandler})
+    local ____resolvedConfig_server_14 = resolvedConfig.server
+    local ____config_server_12 = config
+    if ____config_server_12 ~= nil then
+        ____config_server_12 = ____config_server_12.server
+    end
+    local ____config_server_init_options_10 = ____config_server_12
+    if ____config_server_init_options_10 ~= nil then
+        ____config_server_init_options_10 = ____config_server_init_options_10.init_options
+    end
+    ____resolvedConfig_server_14.init_options = __TS__ObjectAssign({}, ____config_server_init_options_10, init_options)
     tsserver.setup(resolvedConfig.server)
 end
 return ____exports

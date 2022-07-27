@@ -46,6 +46,7 @@ declare namespace NvimLsp {
   ) => typeof res;
 
   interface ServerOptions {
+    init_options?: Record<string, any>;
     on_attach?: (this: void, client: Client, bufnr: number) => void;
     on_init?: (this: void, client: Client, initialize_result: unknown) => void;
     handlers?: {

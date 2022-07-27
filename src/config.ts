@@ -7,7 +7,7 @@ export interface ConfigOptions {
 class Config implements ConfigOptions {
   disable_commands = false;
   debug = false;
-  server: NvimLsp.ServerOptions = {};
+  server: NvimLsp.ServerOptions = { init_options: { hostInfo: "neovim" } };
 
   setup(userOpts: ConfigOptions) {
     Object.assign(this, userOpts);

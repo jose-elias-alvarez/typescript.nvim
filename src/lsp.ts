@@ -6,7 +6,7 @@ import { TypescriptMethods } from "./types/methods";
 
 export const setupLsp = (overrides?: ConfigOptions) => {
   const resolvedConfig = { ...config, ...(overrides || {}) };
-  const { on_init, on_attach, handlers } = resolvedConfig.server;
+  const { on_init, on_attach, handlers, init_options } = resolvedConfig.server;
 
   resolvedConfig.server.on_init = (client, initialize_result) => {
     on_init?.(client, initialize_result);
@@ -24,6 +24,11 @@ export const setupLsp = (overrides?: ConfigOptions) => {
     ...(handlers || {}),
     [TypescriptMethods.RENAME]:
       handlers?.[TypescriptMethods.RENAME] ?? renameHandler,
+  };
+
+  resolvedConfig.server.init_options = {
+    ...config?.server?.init_options,
+    ...init_options,
   };
 
   tsserver.setup(resolvedConfig.server);
