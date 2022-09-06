@@ -1,6 +1,6 @@
+import { Methods } from "@ts/types/methods";
+import { debugLog, getClient } from "@ts/utils";
 import { util } from "lspconfig";
-import { Methods } from "./types/methods";
-import { debugLog, getClient } from "./utils";
 
 interface ExecuteCommandParams {
   command: string;

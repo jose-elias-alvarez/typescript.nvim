@@ -2618,13 +2618,13 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____lspconfig = require("lspconfig")
-local util = ____lspconfig.util
 local ____methods = require("types.methods")
 local Methods = ____methods.Methods
 local ____utils = require("utils")
 local debugLog = ____utils.debugLog
 local getClient = ____utils.getClient
+local ____lspconfig = require("lspconfig")
+local util = ____lspconfig.util
 local function sendRequest(sourceBufnr, source, target)
     local client = getClient(sourceBufnr)
     if not client then
@@ -2853,8 +2853,6 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____lspconfig = require("lspconfig")
-local tsserver = ____lspconfig.tsserver
 local ____commands = require("commands")
 local setupCommands = ____commands.setupCommands
 local ____config = require("config")
@@ -2863,6 +2861,8 @@ local ____handlers = require("handlers")
 local renameHandler = ____handlers.renameHandler
 local ____methods = require("types.methods")
 local TypescriptMethods = ____methods.TypescriptMethods
+local ____lspconfig = require("lspconfig")
+local tsserver = ____lspconfig.tsserver
 ____exports.setupLsp = function(overrides)
     local resolvedConfig = __TS__ObjectAssign({}, config, overrides or ({}))
     local ____resolvedConfig_server_0 = resolvedConfig.server
@@ -2907,12 +2907,12 @@ ____exports.setup = function(userOptions)
     setupConfig(userOptions)
     setupLsp()
 end
-____exports.actions = require("source-actions")
 do
     local ____rename_2Dfile = require("rename-file")
     local renameFile = ____rename_2Dfile.renameFile
     ____exports.renameFile = renameFile
 end
+____exports.actions = require("source-actions")
 return ____exports
  end,
 }

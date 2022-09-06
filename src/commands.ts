@@ -1,10 +1,10 @@
-import { renameFile } from "./rename-file";
+import { renameFile } from "@ts/rename-file";
 import {
   addMissingImports,
   fixAll,
   organizeImports,
   removeUnused,
-} from "./source-actions";
+} from "@ts/source-actions";
 
 export const setupCommands = (bufnr: number) => {
   vim.api.nvim_buf_create_user_command(

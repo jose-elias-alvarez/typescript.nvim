@@ -1,4 +1,4 @@
-import { config } from "./config";
+import { config } from "@ts/config";
 
 export const debugLog = (...args: unknown[]): void => {
   if (!config.debug) {

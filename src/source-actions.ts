@@ -1,6 +1,6 @@
+import { Methods } from "@ts/types/methods";
+import { debugLog, getClient } from "@ts/utils";
 import { Diagnostic, TextDocumentEdit } from "vscode-languageserver-types";
-import { Methods } from "./types/methods";
-import { debugLog, getClient } from "./utils";
 
 enum SourceActions {
   SourceAddMissingImportsTs = "source.addMissingImports.ts",

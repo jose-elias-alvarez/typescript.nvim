@@ -1,8 +1,8 @@
+import { setupCommands } from "@ts/commands";
+import { config, ConfigOptions } from "@ts/config";
+import { renameHandler } from "@ts/handlers";
+import { TypescriptMethods } from "@ts/types/methods";
 import { tsserver } from "lspconfig";
-import { setupCommands } from "./commands";
-import { config, ConfigOptions } from "./config";
-import { renameHandler } from "./handlers";
-import { TypescriptMethods } from "./types/methods";
 
 export const setupLsp = (overrides?: ConfigOptions) => {
   const resolvedConfig = { ...config, ...(overrides || {}) };

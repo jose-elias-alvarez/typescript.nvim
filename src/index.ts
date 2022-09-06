@@ -1,10 +1,10 @@
-import { ConfigOptions, setupConfig } from "./config";
-import { setupLsp } from "./lsp";
+import { ConfigOptions, setupConfig } from "@ts/config";
+import { setupLsp } from "@ts/lsp";
 
 export const setup = (userOptions: ConfigOptions) => {
   setupConfig(userOptions);
   setupLsp();
 };
 
-export * as actions from "./source-actions";
-export { renameFile } from "./rename-file";
+export { renameFile } from "@ts/rename-file";
+export * as actions from "@ts/source-actions";

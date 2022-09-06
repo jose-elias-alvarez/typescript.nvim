@@ -6,6 +6,10 @@
     "moduleResolution": "node",
     "types": ["@typescript-to-lua/language-extensions", "lua-types/jit"],
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "src",
+    "paths": {
+      "@ts/*": ["*"]
+    }
   }
 }
