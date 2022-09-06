@@ -278,11 +278,15 @@ local function __TS__ArrayPushArray(self, items)
     return len
 end
 
+local function __TS__CountVarargs(...)
+    return select("#", ...)
+end
+
 local function __TS__ArrayReduce(self, callbackFn, ...)
     local len = #self
     local k = 0
     local accumulator = nil
-    if select("#", ...) ~= 0 then
+    if __TS__CountVarargs(...) ~= 0 then
         accumulator = ...
     elseif len > 0 then
         accumulator = self[1]
@@ -306,7 +310,7 @@ local function __TS__ArrayReduceRight(self, callbackFn, ...)
     local len = #self
     local k = len - 1
     local accumulator = nil
-    if select("#", ...) ~= 0 then
+    if __TS__CountVarargs(...) ~= 0 then
         accumulator = ...
     elseif len > 0 then
         accumulator = self[k + 1]
@@ -368,7 +372,11 @@ end
 
 local function __TS__ArraySlice(self, first, last)
     local len = #self
-    first = first or 0
+    local ____first_0 = first
+    if ____first_0 == nil then
+        ____first_0 = 0
+    end
+    first = ____first_0
     if first < 0 then
         first = len + first
         if first < 0 then
@@ -379,7 +387,11 @@ local function __TS__ArraySlice(self, first, last)
             first = len
         end
     end
-    last = last or len
+    local ____last_1 = last
+    if ____last_1 == nil then
+        ____last_1 = len
+    end
+    last = ____last_1
     if last < 0 then
         last = len + last
         if last < 0 then
@@ -414,7 +426,7 @@ end
 local function __TS__ArraySplice(self, ...)
     local args = {...}
     local len = #self
-    local actualArgumentCount = select("#", ...)
+    local actualArgumentCount = __TS__CountVarargs(...)
     local start = args[1]
     local deleteCount = args[2]
     if start < 0 then
@@ -435,7 +447,11 @@ local function __TS__ArraySplice(self, ...)
     elseif actualArgumentCount == 1 then
         actualDeleteCount = len - start
     else
-        actualDeleteCount = deleteCount or 0
+        local ____deleteCount_0 = deleteCount
+        if ____deleteCount_0 == nil then
+            ____deleteCount_0 = 0
+        end
+        actualDeleteCount = ____deleteCount_0
         if actualDeleteCount < 0 then
             actualDeleteCount = 0
         end
@@ -674,7 +690,7 @@ do
             end
         else
             local ____self_fulfilledCallbacks_2 = self.fulfilledCallbacks
-            ____self_fulfilledCallbacks_2[#____self_fulfilledCallbacks_2 + 1] = function() return resolve(nil, nil) end
+            ____self_fulfilledCallbacks_2[#____self_fulfilledCallbacks_2 + 1] = function(____, v) return resolve(nil, v) end
         end
         if onRejected then
             local internalCallback = self:createPromiseResolvingCallback(onRejected, resolve, reject)
@@ -683,6 +699,9 @@ do
             if isRejected then
                 internalCallback(nil, self.rejectionReason)
             end
+        else
+            local ____self_rejectedCallbacks_4 = self.rejectedCallbacks
+            ____self_rejectedCallbacks_4[#____self_rejectedCallbacks_4 + 1] = function(____, err) return reject(nil, err) end
         end
         if isFulfilled then
             resolve(nil, self.value)
@@ -697,8 +716,8 @@ do
     end
     function __TS__Promise.prototype.finally(self, onFinally)
         if onFinally then
-            local ____self_finallyCallbacks_4 = self.finallyCallbacks
-            ____self_finallyCallbacks_4[#____self_finallyCallbacks_4 + 1] = onFinally
+            local ____self_finallyCallbacks_5 = self.finallyCallbacks
+            ____self_finallyCallbacks_5[#____self_finallyCallbacks_5 + 1] = onFinally
             if self.state ~= 0 then
                 onFinally(nil)
             end
@@ -776,7 +795,7 @@ local function __TS__AsyncAwaiter(generator)
     return __TS__New(
         __TS__Promise,
         function(____, resolve, reject)
-            local adopt, fulfilled, rejected, step, asyncCoroutine
+            local adopt, fulfilled, step, resolved, asyncCoroutine
             function adopt(self, value)
                 local ____temp_0
                 if __TS__InstanceOf(value, __TS__Promise) then
@@ -787,57 +806,44 @@ local function __TS__AsyncAwaiter(generator)
                 return ____temp_0
             end
             function fulfilled(self, value)
-                local success, errorOrErrorHandler, resultOrError = coroutine.resume(asyncCoroutine, value)
+                local success, resultOrError = coroutine.resume(asyncCoroutine, value)
                 if success then
-                    step(nil, resultOrError, errorOrErrorHandler)
+                    step(nil, resultOrError)
                 else
-                    reject(nil, errorOrErrorHandler)
+                    reject(nil, resultOrError)
                 end
             end
-            function rejected(self, handler)
-                if handler then
-                    return function(____, value)
-                        local success, hasReturnedOrError, returnedValue = pcall(handler, value)
-                        if success then
-                            if hasReturnedOrError then
-                                resolve(nil, returnedValue)
-                            else
-                                step(nil, hasReturnedOrError, handler)
-                            end
-                        else
-                            reject(nil, hasReturnedOrError)
-                        end
-                    end
-                else
-                    return function(____, value)
-                        reject(nil, value)
-                    end
+            function step(self, result)
+                if resolved then
+                    return
                 end
-            end
-            function step(self, result, errorHandler)
                 if coroutine.status(asyncCoroutine) == "dead" then
                     resolve(nil, result)
                 else
                     local ____self_1 = adopt(nil, result)
-                    ____self_1["then"](
-                        ____self_1,
-                        fulfilled,
-                        rejected(nil, errorHandler)
-                    )
+                    ____self_1["then"](____self_1, fulfilled, reject)
                 end
             end
+            resolved = false
             asyncCoroutine = coroutine.create(generator)
-            local success, errorOrErrorHandler, resultOrError = coroutine.resume(asyncCoroutine)
+            local success, resultOrError = coroutine.resume(
+                asyncCoroutine,
+                function(____, v)
+                    resolved = true
+                    local ____self_2 = adopt(nil, v)
+                    ____self_2["then"](____self_2, resolve, reject)
+                end
+            )
             if success then
-                step(nil, resultOrError, errorOrErrorHandler)
+                step(nil, resultOrError)
             else
-                reject(nil, errorOrErrorHandler)
+                reject(nil, resultOrError)
             end
         end
     )
 end
-local function __TS__Await(errorHandler, thing)
-    return coroutine.yield(errorHandler, thing)
+local function __TS__Await(thing)
+    return coroutine.yield(thing)
 end
 
 local function __TS__ClassExtends(target, base)
@@ -1037,6 +1043,16 @@ local function __TS__DecorateParam(paramIndex, decorator)
     return function(____, target, key) return decorator(nil, target, key, paramIndex) end
 end
 
+local function __TS__StringIncludes(self, searchString, position)
+    if not position then
+        position = 1
+    else
+        position = position + 1
+    end
+    local index = string.find(self, searchString, position, true)
+    return index ~= nil
+end
+
 local Error, RangeError, ReferenceError, SyntaxError, TypeError, URIError
 do
     local function getErrorStack(self, constructor)
@@ -1051,13 +1067,18 @@ do
                 break
             end
         end
-        return debug.traceback(nil, level)
+        if __TS__StringIncludes(_VERSION, "Lua 5.0") then
+            return debug.traceback(("[Level " .. tostring(level)) .. "]")
+        else
+            return debug.traceback(nil, level)
+        end
     end
     local function wrapErrorToString(self, getDescription)
         return function(self)
             local description = getDescription(self)
             local caller = debug.getinfo(3, "f")
-            if _VERSION == "Lua 5.1" or caller and caller.func ~= error then
+            local isClassicLua = __TS__StringIncludes(_VERSION, "Lua 5.0") or _VERSION == "Lua 5.1"
+            if isClassicLua or caller and caller.func ~= error then
                 return description
             else
                 return (tostring(description) .. "\n") .. self.stack
@@ -1206,9 +1227,9 @@ do
     function __TS__Generator(fn)
         return function(...)
             local args = {...}
-            local argsLength = select("#", ...)
+            local argsLength = __TS__CountVarargs(...)
             return {
-                ____coroutine = coroutine.create(function() return fn((unpack or table.unpack)(args, 1, argsLength)) end),
+                ____coroutine = coroutine.create(function() return fn(__TS__Unpack(args, 1, argsLength)) end),
                 [Symbol.iterator] = generatorIterator,
                 next = generatorNext
             }
@@ -1219,6 +1240,16 @@ end
 local function __TS__InstanceOfObject(value)
     local valueType = type(value)
     return valueType == "table" or valueType == "function"
+end
+
+local function __TS__LuaIteratorSpread(self, state, firstKey)
+    local results = {}
+    local key, value = self(state, firstKey)
+    while key do
+        results[#results + 1] = {key, value}
+        key, value = self(state, key)
+    end
+    return __TS__Unpack(results)
 end
 
 local Map
@@ -1316,9 +1347,8 @@ do
         return self:entries()
     end
     function Map.prototype.entries(self)
-        local ____temp_0 = self
-        local items = ____temp_0.items
-        local nextKey = ____temp_0.nextKey
+        local items = self.items
+        local nextKey = self.nextKey
         local key = self.firstKey
         return {
             [Symbol.iterator] = function(self)
@@ -1346,9 +1376,8 @@ do
         }
     end
     function Map.prototype.values(self)
-        local ____temp_1 = self
-        local items = ____temp_1.items
-        local nextKey = ____temp_1.nextKey
+        local items = self.items
+        local nextKey = self.nextKey
         local key = self.firstKey
         return {
             [Symbol.iterator] = function(self)
@@ -1364,7 +1393,11 @@ do
     Map[Symbol.species] = Map
 end
 
+local __TS__Match = string.match
+
 local __TS__MathAtan2 = math.atan2 or math.atan
+
+local __TS__MathModf = math.modf
 
 local function __TS__MathSign(val)
     if val > 0 then
@@ -1373,6 +1406,10 @@ local function __TS__MathSign(val)
         return -1
     end
     return 0
+end
+
+local function __TS__Modulo50(a, b)
+    return a - math.floor(a / b) * b
 end
 
 local function __TS__Number(value)
@@ -1421,7 +1458,7 @@ do
         if radix < 2 or radix > 36 then
             error("toString() radix argument must be between 2 and 36", 0)
         end
-        local integer, fraction = math.modf(math.abs(self))
+        local integer, fraction = __TS__MathModf(math.abs(self))
         local result = ""
         if radix == 8 then
             result = string.format("%o", integer)
@@ -1577,7 +1614,7 @@ local function __TS__ObjectValues(obj)
 end
 
 local function __TS__ParseFloat(numberString)
-    local infinityMatch = string.match(numberString, "^%s*(-?Infinity)")
+    local infinityMatch = __TS__Match(numberString, "^%s*(-?Infinity)")
     if infinityMatch then
         local ____temp_0
         if __TS__StringAccess(infinityMatch, 0) == "-" then
@@ -1587,8 +1624,12 @@ local function __TS__ParseFloat(numberString)
         end
         return ____temp_0
     end
-    local number = tonumber(string.match(numberString, "^%s*(-?%d+%.?%d*)"))
-    return number or 0 / 0
+    local number = tonumber(__TS__Match(numberString, "^%s*(-?%d+%.?%d*)"))
+    local ____number_1 = number
+    if ____number_1 == nil then
+        ____number_1 = 0 / 0
+    end
+    return ____number_1
 end
 
 local function __TS__StringSubstr(self, from, length)
@@ -1631,16 +1672,16 @@ do
     function __TS__ParseInt(numberString, base)
         if base == nil then
             base = 10
-            local hexMatch = string.match(numberString, "^%s*-?0[xX]")
+            local hexMatch = __TS__Match(numberString, "^%s*-?0[xX]")
             if hexMatch then
                 base = 16
-                local ____string_match_result__0_0
-                if string.match(hexMatch, "-") then
-                    ____string_match_result__0_0 = "-" .. __TS__StringSubstr(numberString, #hexMatch)
+                local ____TS__Match_result__0_0
+                if __TS__Match(hexMatch, "-") then
+                    ____TS__Match_result__0_0 = "-" .. __TS__StringSubstr(numberString, #hexMatch)
                 else
-                    ____string_match_result__0_0 = __TS__StringSubstr(numberString, #hexMatch)
+                    ____TS__Match_result__0_0 = __TS__StringSubstr(numberString, #hexMatch)
                 end
-                numberString = ____string_match_result__0_0
+                numberString = ____TS__Match_result__0_0
             end
         end
         if base < 2 or base > 36 then
@@ -1655,7 +1696,7 @@ do
         local allowedDigits = ____temp_1
         local pattern = ("^%s*(-?[" .. allowedDigits) .. "]*)"
         local number = tonumber(
-            string.match(numberString, pattern),
+            __TS__Match(numberString, pattern),
             base
         )
         if number == nil then
@@ -1967,13 +2008,13 @@ end
 
 local function __TS__SparseArrayNew(...)
     local sparseArray = {...}
-    sparseArray.sparseLength = select("#", ...)
+    sparseArray.sparseLength = __TS__CountVarargs(...)
     return sparseArray
 end
 
 local function __TS__SparseArrayPush(sparseArray, ...)
     local args = {...}
-    local argsLen = select("#", ...)
+    local argsLen = __TS__CountVarargs(...)
     local listLen = sparseArray.sparseLength
     for i = 1, argsLen do
         sparseArray[listLen + i] = args[i]
@@ -1982,7 +2023,11 @@ local function __TS__SparseArrayPush(sparseArray, ...)
 end
 
 local function __TS__SparseArraySpread(sparseArray)
-    local _unpack = unpack or table.unpack
+    local ____unpack_0 = unpack
+    if ____unpack_0 == nil then
+        ____unpack_0 = table.unpack
+    end
+    local _unpack = ____unpack_0
     return _unpack(sparseArray, 1, sparseArray.sparseLength)
 end
 
@@ -2084,6 +2129,8 @@ local function __TS__SourceMapTraceBack(fileName, sourceMap)
             local trace
             if thread == nil and message == nil and level == nil then
                 trace = originalTraceback()
+            elseif __TS__StringIncludes(_VERSION, "Lua 5.0") then
+                trace = originalTraceback((("[Level " .. tostring(level)) .. "] ") .. message)
             else
                 trace = originalTraceback(thread, message, level)
             end
@@ -2106,10 +2153,23 @@ local function __TS__SourceMapTraceBack(fileName, sourceMap)
                 "(%S+)%.lua:(%d+)",
                 function(file, line) return replacer(nil, file .. ".lua", file .. ".ts", line) end
             )
+            local function stringReplacer(____, file, line)
+                local fileSourceMap = _G.__TS__sourcemap[file]
+                if fileSourceMap and fileSourceMap[line] then
+                    local chunkName = __TS__Match(file, "%[string \"([^\"]+)\"%]")
+                    local sourceName = string.gsub(chunkName, ".lua$", ".ts")
+                    local data = fileSourceMap[line]
+                    if type(data) == "number" then
+                        return (sourceName .. ":") .. tostring(data)
+                    end
+                    return (tostring(data.file) .. ":") .. tostring(data.line)
+                end
+                return (file .. ":") .. line
+            end
             result = string.gsub(
                 result,
                 "(%[string \"[^\"]+\"%]):(%d+)",
-                function(file, line) return replacer(nil, file, "unknown", line) end
+                function(file, line) return stringReplacer(nil, file, line) end
             )
             return result
         end
@@ -2149,7 +2209,11 @@ local function __TS__StringCharCodeAt(self, index)
     if index < 0 then
         return 0 / 0
     end
-    return string.byte(self, index + 1) or 0 / 0
+    local ____string_byte_result_0 = string.byte(self, index + 1)
+    if ____string_byte_result_0 == nil then
+        ____string_byte_result_0 = 0 / 0
+    end
+    return ____string_byte_result_0
 end
 
 local function __TS__StringEndsWith(self, searchString, endPosition)
@@ -2157,16 +2221,6 @@ local function __TS__StringEndsWith(self, searchString, endPosition)
         endPosition = #self
     end
     return string.sub(self, endPosition - #searchString + 1, endPosition) == searchString
-end
-
-local function __TS__StringIncludes(self, searchString, position)
-    if not position then
-        position = 1
-    else
-        position = position + 1
-    end
-    local index = string.find(self, searchString, position, true)
-    return index ~= nil
 end
 
 local function __TS__StringPadEnd(self, maxLength, fillString)
@@ -2424,6 +2478,7 @@ return {
   __TS__Class = __TS__Class,
   __TS__ClassExtends = __TS__ClassExtends,
   __TS__CloneDescriptor = __TS__CloneDescriptor,
+  __TS__CountVarargs = __TS__CountVarargs,
   __TS__Decorate = __TS__Decorate,
   __TS__DecorateParam = __TS__DecorateParam,
   __TS__Delete = __TS__Delete,
@@ -2439,9 +2494,13 @@ return {
   __TS__InstanceOf = __TS__InstanceOf,
   __TS__InstanceOfObject = __TS__InstanceOfObject,
   __TS__Iterator = __TS__Iterator,
+  __TS__LuaIteratorSpread = __TS__LuaIteratorSpread,
   Map = Map,
+  __TS__Match = __TS__Match,
   __TS__MathAtan2 = __TS__MathAtan2,
+  __TS__MathModf = __TS__MathModf,
   __TS__MathSign = __TS__MathSign,
+  __TS__Modulo50 = __TS__Modulo50,
   __TS__New = __TS__New,
   __TS__Number = __TS__Number,
   __TS__NumberIsFinite = __TS__NumberIsFinite,
