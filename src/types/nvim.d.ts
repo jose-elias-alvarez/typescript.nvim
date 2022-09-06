@@ -6,6 +6,16 @@ declare namespace NvimLsp {
     range: import("vscode-languageserver-types").Range;
   }
 
+  type Handler<T = unknown> = (
+    this: void,
+    err: unknown,
+    res: T[],
+    params: unknown
+  ) => void;
+  type Handlers = {
+    [method: string]: Handler;
+  };
+
   interface Client {
     name: string;
     // neovim 0.7
@@ -23,7 +33,7 @@ declare namespace NvimLsp {
       this: void,
       method: import("./methods").Methods,
       params: U,
-      handler?: (err: unknown, res: T[]) => void,
+      handler?: Handler<T>,
       bufnr?: number
     ) => boolean;
     request_sync: <T, U = Record<string, unknown>>(
@@ -33,24 +43,16 @@ declare namespace NvimLsp {
       timeout_ms?: number,
       bufnr?: number
     ) => { result: T[] };
+    handlers: Handlers;
   }
 
   // used in vim.lsp.buf.* callbacks to filter clients
   type ClientFilter = (this: void, client: Client) => boolean;
 
-  type Handler = (
-    this: void,
-    err: unknown,
-    res: unknown,
-    params: unknown
-  ) => typeof res;
-
   interface ServerOptions {
     on_attach?: (this: void, client: Client, bufnr: number) => void;
     on_init?: (this: void, client: Client, initialize_result: unknown) => void;
-    handlers?: {
-      [key in import("./methods").TypescriptMethods]: Handler;
-    };
+    handlers?: Handlers;
   }
 }
 
@@ -67,6 +69,7 @@ declare namespace vim {
   const inspect: (...args: unknown[]) => void;
   const schedule: (this: void, callback: () => void) => void;
   const lsp: {
+    handlers: NvimLsp.Handlers;
     buf_get_clients: (
       this: void,
       bufnr: number
@@ -76,6 +79,14 @@ declare namespace vim {
         textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
         range: import("vscode-languageserver-types").Range;
         context?: import("vscode-languageserver-types").CodeActionContext;
+      };
+      make_position_params: (
+        this: void,
+        winnr: number,
+        offset_encoding: string
+      ) => {
+        textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
+        position: import("vscode-languageserver-types").Position;
       };
       apply_text_edits: (
         this: void,
@@ -100,6 +111,7 @@ declare namespace vim {
   };
   const api: {
     nvim_get_current_buf: (this: void) => number;
+    nvim_get_current_win: (this: void) => number;
     nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
     nvim_buf_get_lines: (
       this: void,

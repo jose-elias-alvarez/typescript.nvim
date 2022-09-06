@@ -14,3 +14,15 @@ export const getClient = (bufnr: number): NvimLsp.Client | undefined => {
     }
   }
 };
+
+export const resolveHandler = (
+  bufnr: number,
+  method: string
+): NvimLsp.Handler | undefined => {
+  const client = getClient(bufnr);
+  if (!client) {
+    return;
+  }
+
+  return client.handlers[method] ?? vim.lsp.handlers[method];
+};

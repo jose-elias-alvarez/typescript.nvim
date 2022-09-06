@@ -72,6 +72,19 @@ Lua commands.
   the current buffer and prompt for a rename target, while the Lua version
   requires specifying the full path to a `source` and `target`.
 
+- Go to source definition: `:TypescriptGoToSourceDefinition` /
+  `require("typescript").goToSourceDefinition(winnr)`
+
+  > TypeScript 4.7 contains support for a new experimental editor command called
+  > Go To Source Definition. It’s similar to Go To Definition, but it never
+  > returns results inside declaration files. Instead, it tries to find
+  > corresponding implementation files (like .js or .ts files), and find
+  > definitions there — even if those files are normally shadowed by .d.ts
+  > files.
+
+  The command requires a position and derives it from the current window when
+  using the Vim command or from the given `winnr` when using the Lua API.
+
 ### Handlers
 
 The plugin defines handlers for off-spec methods that are not otherwise
