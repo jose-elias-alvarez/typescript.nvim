@@ -1,9 +1,16 @@
+<!-- markdownlint-configure-file
+{
+  "line-length": false,
+  "no-inline-html": false
+}
+-->
+
 # typescript.nvim
 
 A minimal `typescript-language-server` integration plugin to set up the language
 server via [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and add
-commands for convenience. Written in TypeScript and transpiled to
-Lua using [TypeScriptToLua](https://github.com/TypeScriptToLua/TypeScriptToLua).
+commands for convenience. Written in TypeScript and transpiled to Lua using
+[TypeScriptToLua](https://github.com/TypeScriptToLua/TypeScriptToLua).
 
 This plugin is in **beta status**. It's stable enough for daily use, but
 breaking changes are possible.
@@ -55,8 +62,8 @@ Lua commands.
 
 - Fix all: `:TypescriptFixAll` / `require("typescript").actions.fixAll()`
 
-  Despite the name, this command fixes a handful of specific issues, most notably
-  non-async functions that use `await` and unreachable code.
+  Despite the name, this command fixes a handful of specific issues, most
+  notably non-async functions that use `await` and unreachable code.
 
 - Rename file: `:TypescriptRenameFile` /
   `require("typescript").renameFile(source, target)`
@@ -75,7 +82,8 @@ supported by Neovim.
 
 ## Not yet implemented
 
-- Inlay hints (waiting for [upstream support](https://github.com/neovim/neovim/issues/18086))
+- Inlay hints (waiting for
+  [upstream support](https://github.com/neovim/neovim/issues/18086))
 
 ## Will not support
 
