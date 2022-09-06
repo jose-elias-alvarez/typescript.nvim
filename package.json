@@ -3,8 +3,7 @@
     "prebuild": "npm run lint",
     "build": "tstl -p tsconfig.build.json",
     "dev": "tstl -p tsconfig.build.json --watch",
-    "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
