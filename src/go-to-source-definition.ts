@@ -26,7 +26,23 @@ export const goToSourceDefinition = ({ winnr }: Opts) => {
       command: WorkspaceCommands.GO_TO_SOURCE_DEFINITION,
       arguments: [positionParams.textDocument.uri, positionParams.position],
     },
-    resolveHandler(bufnr, Methods.DEFINITION)
+    (...args) => {
+      const res = args[1];
+      if (vim.tbl_isempty(res)) {
+        print("failed to go to source definition: no source definitions found");
+        return;
+      }
+
+      const handler = resolveHandler(bufnr, Methods.DEFINITION);
+      if (!handler) {
+        print(
+          "failed to go to source definition: could not resolve definition handler"
+        );
+        return;
+      }
+
+      handler(...args);
+    }
   );
 
   if (!requestOk) {

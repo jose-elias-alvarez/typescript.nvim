@@ -6,11 +6,19 @@ declare namespace NvimLsp {
     range: import("vscode-languageserver-types").Range;
   }
 
+  interface HandlerContext {
+    bufnr: number;
+    client_id: number;
+    method: string;
+    params: Record<string, unknown>;
+  }
+
   type Handler<T = unknown> = (
     this: void,
     err: unknown,
     res: T[],
-    params: unknown
+    ctx: HandlerContext,
+    config: Record<string, unknown>
   ) => void;
   type Handlers = {
     [method: string]: Handler;
@@ -68,6 +76,7 @@ declare namespace Nvim {
 declare namespace vim {
   const inspect: (...args: unknown[]) => void;
   const schedule: (this: void, callback: () => void) => void;
+  const tbl_isempty: (this: void, tbl: unknown[]) => boolean;
   const lsp: {
     handlers: NvimLsp.Handlers;
     buf_get_clients: (
