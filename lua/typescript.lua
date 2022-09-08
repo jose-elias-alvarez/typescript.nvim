@@ -2658,7 +2658,7 @@ ____exports.goToSourceDefinition = function(____bindingPattern0)
     local bufnr = vim.api.nvim_win_get_buf(winnr)
     local client = getClient(bufnr)
     if not client then
-        return
+        return false
     end
     local positionParams = vim.lsp.util.make_position_params(winnr, client.offset_encoding)
     local requestOk = executeCommand(
@@ -2682,6 +2682,7 @@ ____exports.goToSourceDefinition = function(____bindingPattern0)
     if not requestOk then
         print("failed to go to source definition: tsserver request failed")
     end
+    return requestOk
 end
 return ____exports
  end,
@@ -2713,7 +2714,7 @@ ____exports.renameFile = function(source, target, opts)
         local status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No")
         if status ~= 1 then
             debugLog("user declined to overrwrite file; aborting")
-            return
+            return false
         end
     end
     debugLog((("sending request to rename source " .. source) .. " to target ") .. target)
@@ -2729,7 +2730,7 @@ ____exports.renameFile = function(source, target, opts)
     )
     if not requestOk then
         print("failed to rename file: tsserver request failed")
-        return
+        return false
     end
     if vim.api.nvim_buf_get_option(sourceBufnr, "modified") then
         vim.api.nvim_buf_call(
@@ -2754,6 +2755,7 @@ ____exports.renameFile = function(source, target, opts)
         end
     end
     vim.schedule(function() return vim.api.nvim_buf_delete(sourceBufnr, {force = true}) end)
+    return true
 end
 return ____exports
  end,
