@@ -7,7 +7,7 @@ import {
   removeUnused,
 } from "@ts/source-actions";
 
-export const setupCommands = (bufnr: number) => {
+export const setupCommands = (bufnr: number): void => {
   vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptRenameFile",

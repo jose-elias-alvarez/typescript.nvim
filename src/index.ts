@@ -1,7 +1,7 @@
 import { ConfigOptions, setupConfig } from "@ts/config";
 import { setupLsp } from "@ts/lsp";
 
-export const setup = (userOptions: ConfigOptions) => {
+export const setup = (userOptions: ConfigOptions): void => {
   setupConfig(userOptions);
   setupLsp();
 };

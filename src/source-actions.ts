@@ -29,7 +29,7 @@ interface Opts {
 
 const makeCommand =
   (sourceAction: SourceActions) =>
-  (opts: Opts = {}) => {
+  (opts: Opts = {}): void => {
     const bufnr = opts.bufnr ?? vim.api.nvim_get_current_buf();
     const client = getClient(bufnr);
     if (!client) {
@@ -44,7 +44,7 @@ const makeCommand =
       },
     };
 
-    const applyEdits = function (res: Result[]) {
+    const applyEdits = (res: Result[]): void => {
       debugLog(`received response:`, vim.inspect(res));
       if (res[0]?.edit?.documentChanges?.[0]?.edits === undefined) {
         return;

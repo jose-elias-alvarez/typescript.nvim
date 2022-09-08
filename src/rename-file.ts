@@ -11,7 +11,7 @@ export const renameFile = (
   source: string,
   target: string,
   opts: Opts = {}
-): void => {
+): boolean => {
   const sourceBufnr = vim.fn.bufadd(source);
   vim.fn.bufload(sourceBufnr);
 
@@ -22,7 +22,7 @@ export const renameFile = (
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
     if (status !== 1) {
       debugLog("user declined to overrwrite file; aborting");
-      return;
+      return false;
     }
   }
 
@@ -38,7 +38,7 @@ export const renameFile = (
   });
   if (!requestOk) {
     print("failed to rename file: tsserver request failed");
-    return;
+    return false;
   }
 
   if (vim.api.nvim_buf_get_option<boolean>(sourceBufnr, "modified")) {
@@ -61,4 +61,6 @@ export const renameFile = (
     }
   }
   vim.schedule(() => vim.api.nvim_buf_delete(sourceBufnr, { force: true }));
+
+  return true;
 };

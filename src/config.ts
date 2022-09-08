@@ -9,13 +9,13 @@ class Config implements ConfigOptions {
   debug = false;
   server: NvimLsp.ServerOptions = {};
 
-  setup(userOpts: ConfigOptions) {
+  setup(userOpts: ConfigOptions): void {
     Object.assign(this, userOpts);
   }
 }
 
 export const config = new Config();
 
-export const setupConfig = (userOpts: ConfigOptions) => {
+export const setupConfig = (userOpts: ConfigOptions): void => {
   config.setup(userOpts);
 };

@@ -8,11 +8,11 @@ interface Opts {
   winnr: number;
 }
 
-export const goToSourceDefinition = ({ winnr }: Opts) => {
+export const goToSourceDefinition = ({ winnr }: Opts): boolean => {
   const bufnr = vim.api.nvim_win_get_buf(winnr);
   const client = getClient(bufnr);
   if (!client) {
-    return;
+    return false;
   }
 
   const positionParams = vim.lsp.util.make_position_params(
@@ -48,4 +48,6 @@ export const goToSourceDefinition = ({ winnr }: Opts) => {
   if (!requestOk) {
     print("failed to go to source definition: tsserver request failed");
   }
+
+  return requestOk;
 };

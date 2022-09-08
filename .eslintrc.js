@@ -8,9 +8,10 @@ module.exports = {
     "plugin:prettier/recommended",
   ],
   rules: {
-    ["@typescript-eslint/strict-boolean-expressions"]: ["error"],
+    "@typescript-eslint/strict-boolean-expressions": "error",
+    "@typescript-eslint/explicit-function-return-type": "warn",
   },
   parserOptions: {
-    project: "./tsconfig.json"
-  }
+    project: "./tsconfig.json",
+  },
 };
