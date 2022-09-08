@@ -1,36 +1,11 @@
-import { Methods } from "@ts/types/methods";
-import { debugLog, getClient } from "@ts/utils";
+import { executeCommand } from "@ts/execute-command";
+import { WorkspaceCommands } from "@ts/types/workspace-commands";
+import { debugLog } from "@ts/utils";
 import { util } from "lspconfig";
-
-interface ExecuteCommandParams {
-  command: string;
-  arguments: unknown[];
-}
 
 interface Opts {
   force?: boolean;
 }
-
-const sendRequest = (
-  sourceBufnr: number,
-  source: string,
-  target: string
-): boolean => {
-  const client = getClient(sourceBufnr);
-  if (!client) {
-    return false;
-  }
-
-  return client.request<void, ExecuteCommandParams>(Methods.EXECUTE_COMMAND, {
-    command: "_typescript.applyRenameFile",
-    arguments: [
-      {
-        sourceUri: vim.uri_from_fname(source),
-        targetUri: vim.uri_from_fname(target),
-      },
-    ],
-  });
-};
 
 export const renameFile = (
   source: string,
@@ -52,7 +27,15 @@ export const renameFile = (
   }
 
   debugLog(`sending request to rename source ${source} to target ${target}`);
-  const requestOk = sendRequest(sourceBufnr, source, target);
+  const requestOk = executeCommand(sourceBufnr, {
+    command: WorkspaceCommands.APPLY_RENAME_FILE,
+    arguments: [
+      {
+        sourceUri: vim.uri_from_fname(source),
+        targetUri: vim.uri_from_fname(target),
+      },
+    ],
+  });
   if (!requestOk) {
     print("failed to rename file: tsserver request failed");
     return;

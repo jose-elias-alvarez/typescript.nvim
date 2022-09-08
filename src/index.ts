@@ -6,5 +6,6 @@ export const setup = (userOptions: ConfigOptions) => {
   setupLsp();
 };
 
+export { goToSourceDefinition } from "@ts/go-to-source-definition";
 export { renameFile } from "@ts/rename-file";
 export * as actions from "@ts/source-actions";

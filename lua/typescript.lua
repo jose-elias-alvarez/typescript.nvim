@@ -2561,9 +2561,18 @@ return {
 local ____exports = {}
 ____exports.Methods = Methods or ({})
 ____exports.Methods.CODE_ACTION = "textDocument/codeAction"
+____exports.Methods.DEFINITION = "textDocument/definition"
 ____exports.Methods.EXECUTE_COMMAND = "workspace/executeCommand"
 ____exports.TypescriptMethods = TypescriptMethods or ({})
 ____exports.TypescriptMethods.RENAME = "_typescript.rename"
+return ____exports
+ end,
+["types.workspace-commands"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports.WorkspaceCommands = WorkspaceCommands or ({})
+____exports.WorkspaceCommands.APPLY_RENAME_FILE = "_typescript.applyRenameFile"
+____exports.WorkspaceCommands.GO_TO_SOURCE_DEFINITION = "_typescript.goToSourceDefinition"
 return ____exports
  end,
 ["config"] = function(...) 
@@ -2606,6 +2615,74 @@ ____exports.getClient = function(bufnr)
         end
     end
 end
+____exports.resolveHandler = function(bufnr, method)
+    local client = ____exports.getClient(bufnr)
+    if not client then
+        return
+    end
+    return client.handlers[method] or vim.lsp.handlers[method]
+end
+return ____exports
+ end,
+["execute-command"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____methods = require("types.methods")
+local Methods = ____methods.Methods
+local ____utils = require("utils")
+local getClient = ____utils.getClient
+____exports.executeCommand = function(bufnr, params, callback)
+    local client = getClient(bufnr)
+    if not client then
+        return false
+    end
+    return client.request(Methods.EXECUTE_COMMAND, params, callback)
+end
+return ____exports
+ end,
+["go-to-source-definition"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____execute_2Dcommand = require("execute-command")
+local executeCommand = ____execute_2Dcommand.executeCommand
+local ____methods = require("types.methods")
+local Methods = ____methods.Methods
+local ____workspace_2Dcommands = require("types.workspace-commands")
+local WorkspaceCommands = ____workspace_2Dcommands.WorkspaceCommands
+local ____utils = require("utils")
+local getClient = ____utils.getClient
+local resolveHandler = ____utils.resolveHandler
+____exports.goToSourceDefinition = function(____bindingPattern0)
+    local winnr
+    winnr = ____bindingPattern0.winnr
+    local bufnr = vim.api.nvim_win_get_buf(winnr)
+    local client = getClient(bufnr)
+    if not client then
+        return
+    end
+    local positionParams = vim.lsp.util.make_position_params(winnr, client.offset_encoding)
+    local requestOk = executeCommand(
+        bufnr,
+        {command = WorkspaceCommands.GO_TO_SOURCE_DEFINITION, arguments = {positionParams.textDocument.uri, positionParams.position}},
+        function(...)
+            local args = {...}
+            local res = args[2]
+            if vim.tbl_isempty(res) then
+                print("failed to go to source definition: no source definitions found")
+                return
+            end
+            local handler = resolveHandler(bufnr, Methods.DEFINITION)
+            if not handler then
+                print("failed to go to source definition: could not resolve definition handler")
+                return
+            end
+            handler(unpack(args))
+        end
+    )
+    if not requestOk then
+        print("failed to go to source definition: tsserver request failed")
+    end
+end
 return ____exports
  end,
 ["rename-file"] = function(...) 
@@ -2618,29 +2695,14 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____methods = require("types.methods")
-local Methods = ____methods.Methods
+local ____execute_2Dcommand = require("execute-command")
+local executeCommand = ____execute_2Dcommand.executeCommand
+local ____workspace_2Dcommands = require("types.workspace-commands")
+local WorkspaceCommands = ____workspace_2Dcommands.WorkspaceCommands
 local ____utils = require("utils")
 local debugLog = ____utils.debugLog
-local getClient = ____utils.getClient
 local ____lspconfig = require("lspconfig")
 local util = ____lspconfig.util
-local function sendRequest(sourceBufnr, source, target)
-    local client = getClient(sourceBufnr)
-    if not client then
-        return false
-    end
-    return client.request(
-        Methods.EXECUTE_COMMAND,
-        {
-            command = "_typescript.applyRenameFile",
-            arguments = {{
-                sourceUri = vim.uri_from_fname(source),
-                targetUri = vim.uri_from_fname(target)
-            }}
-        }
-    )
-end
 ____exports.renameFile = function(source, target, opts)
     if opts == nil then
         opts = {}
@@ -2655,7 +2717,16 @@ ____exports.renameFile = function(source, target, opts)
         end
     end
     debugLog((("sending request to rename source " .. source) .. " to target ") .. target)
-    local requestOk = sendRequest(sourceBufnr, source, target)
+    local requestOk = executeCommand(
+        sourceBufnr,
+        {
+            command = WorkspaceCommands.APPLY_RENAME_FILE,
+            arguments = {{
+                sourceUri = vim.uri_from_fname(source),
+                targetUri = vim.uri_from_fname(target)
+            }}
+        }
+    )
     if not requestOk then
         print("failed to rename file: tsserver request failed")
         return
@@ -2770,6 +2841,8 @@ return ____exports
 ["commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____go_2Dto_2Dsource_2Ddefinition = require("go-to-source-definition")
+local goToSourceDefinition = ____go_2Dto_2Dsource_2Ddefinition.goToSourceDefinition
 local ____rename_2Dfile = require("rename-file")
 local renameFile = ____rename_2Dfile.renameFile
 local ____source_2Dactions = require("source-actions")
@@ -2782,7 +2855,7 @@ ____exports.setupCommands = function(bufnr)
         bufnr,
         "TypescriptRenameFile",
         function(opts)
-            local source = vim.api.nvim_buf_get_name(0)
+            local source = vim.api.nvim_buf_get_name(bufnr)
             vim.ui.input(
                 {prompt = "New path: ", default = source},
                 function(input)
@@ -2794,6 +2867,12 @@ ____exports.setupCommands = function(bufnr)
             )
         end,
         {bang = true}
+    )
+    vim.api.nvim_buf_create_user_command(
+        bufnr,
+        "TypescriptGoToSourceDefinition",
+        function() return goToSourceDefinition({winnr = vim.api.nvim_get_current_win()}) end,
+        {}
     )
     vim.api.nvim_buf_create_user_command(
         bufnr,
@@ -2906,6 +2985,11 @@ local setupLsp = ____lsp.setupLsp
 ____exports.setup = function(userOptions)
     setupConfig(userOptions)
     setupLsp()
+end
+do
+    local ____go_2Dto_2Dsource_2Ddefinition = require("go-to-source-definition")
+    local goToSourceDefinition = ____go_2Dto_2Dsource_2Ddefinition.goToSourceDefinition
+    ____exports.goToSourceDefinition = goToSourceDefinition
 end
 do
     local ____rename_2Dfile = require("rename-file")

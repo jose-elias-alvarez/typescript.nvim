@@ -1,3 +1,4 @@
+import { goToSourceDefinition } from "@ts/go-to-source-definition";
 import { renameFile } from "@ts/rename-file";
 import {
   addMissingImports,
@@ -11,7 +12,7 @@ export const setupCommands = (bufnr: number) => {
     bufnr,
     "TypescriptRenameFile",
     (opts) => {
-      const source = vim.api.nvim_buf_get_name(0);
+      const source = vim.api.nvim_buf_get_name(bufnr);
       vim.ui.input({ prompt: "New path: ", default: source }, (input) => {
         if (input === "" || input === source || input === undefined) {
           return;
@@ -22,6 +23,13 @@ export const setupCommands = (bufnr: number) => {
       });
     },
     { bang: true }
+  );
+
+  vim.api.nvim_buf_create_user_command(
+    bufnr,
+    "TypescriptGoToSourceDefinition",
+    () => goToSourceDefinition({ winnr: vim.api.nvim_get_current_win() }),
+    {}
   );
 
   vim.api.nvim_buf_create_user_command(
