@@ -2556,6 +2556,32 @@ return {
   __TS__Unpack = __TS__Unpack
 }
  end,
+["config"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local Config = __TS__Class()
+Config.name = "Config"
+function Config.prototype.____constructor(self)
+    self.disable_commands = false
+    self.debug = false
+    self.server = {}
+    self.go_to_source_definition = {fallback = true}
+end
+function Config.prototype.setup(self, userOpts)
+    __TS__ObjectAssign(
+        self,
+        vim.tbl_deep_extend("force", self, userOpts)
+    )
+end
+____exports.config = __TS__New(Config)
+____exports.setupConfig = function(userOpts)
+    ____exports.config:setup(userOpts)
+end
+return ____exports
+ end,
 ["types.methods"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -2573,28 +2599,6 @@ local ____exports = {}
 ____exports.WorkspaceCommands = WorkspaceCommands or ({})
 ____exports.WorkspaceCommands.APPLY_RENAME_FILE = "_typescript.applyRenameFile"
 ____exports.WorkspaceCommands.GO_TO_SOURCE_DEFINITION = "_typescript.goToSourceDefinition"
-return ____exports
- end,
-["config"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local Config = __TS__Class()
-Config.name = "Config"
-function Config.prototype.____constructor(self)
-    self.disable_commands = false
-    self.debug = false
-    self.server = {}
-end
-function Config.prototype.setup(self, userOpts)
-    __TS__ObjectAssign(self, userOpts)
-end
-____exports.config = __TS__New(Config)
-____exports.setupConfig = function(userOpts)
-    ____exports.config:setup(userOpts)
-end
 return ____exports
  end,
 ["utils"] = function(...) 
@@ -2652,9 +2656,9 @@ local WorkspaceCommands = ____workspace_2Dcommands.WorkspaceCommands
 local ____utils = require("utils")
 local getClient = ____utils.getClient
 local resolveHandler = ____utils.resolveHandler
-____exports.goToSourceDefinition = function(____bindingPattern0)
-    local winnr
-    winnr = ____bindingPattern0.winnr
+____exports.goToSourceDefinition = function(winnr, ____bindingPattern0)
+    local fallback
+    fallback = ____bindingPattern0.fallback
     local bufnr = vim.api.nvim_win_get_buf(winnr)
     local client = getClient(bufnr)
     if not client then
@@ -2666,14 +2670,17 @@ ____exports.goToSourceDefinition = function(____bindingPattern0)
         {command = WorkspaceCommands.GO_TO_SOURCE_DEFINITION, arguments = {positionParams.textDocument.uri, positionParams.position}},
         function(...)
             local args = {...}
-            local res = args[2]
-            if vim.tbl_isempty(res) then
-                print("failed to go to source definition: no source definitions found")
-                return
-            end
             local handler = resolveHandler(bufnr, Methods.DEFINITION)
             if not handler then
                 print("failed to go to source definition: could not resolve definition handler")
+                return
+            end
+            local res = args[2]
+            if vim.tbl_isempty(res) then
+                if fallback == true then
+                    return client.request(Methods.DEFINITION, positionParams, handler, bufnr)
+                end
+                print("failed to go to source definition: no source definitions found")
                 return
             end
             handler(unpack(args))
@@ -2843,6 +2850,8 @@ return ____exports
 ["commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____config = require("config")
+local config = ____config.config
 local ____go_2Dto_2Dsource_2Ddefinition = require("go-to-source-definition")
 local goToSourceDefinition = ____go_2Dto_2Dsource_2Ddefinition.goToSourceDefinition
 local ____rename_2Dfile = require("rename-file")
@@ -2873,7 +2882,10 @@ ____exports.setupCommands = function(bufnr)
     vim.api.nvim_buf_create_user_command(
         bufnr,
         "TypescriptGoToSourceDefinition",
-        function() return goToSourceDefinition({winnr = vim.api.nvim_get_current_win()}) end,
+        function() return goToSourceDefinition(
+            vim.api.nvim_get_current_win(),
+            {fallback = config.go_to_source_definition.fallback}
+        ) end,
         {}
     )
     vim.api.nvim_buf_create_user_command(

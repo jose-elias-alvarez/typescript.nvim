@@ -2,6 +2,9 @@ export interface ConfigOptions {
   disable_commands?: boolean;
   debug?: boolean;
   server?: NvimLsp.ServerOptions;
+  go_to_source_definition?: {
+    fallback: boolean;
+  };
 }
 
 class Config implements ConfigOptions {
@@ -9,8 +12,12 @@ class Config implements ConfigOptions {
   debug = false;
   server: NvimLsp.ServerOptions = {};
 
+  go_to_source_definition = {
+    fallback: true,
+  };
+
   setup(userOpts: ConfigOptions): void {
-    Object.assign(this, userOpts);
+    Object.assign(this, vim.tbl_deep_extend("force", this, userOpts));
   }
 }
 

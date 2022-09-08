@@ -29,16 +29,21 @@ The following example shows all available options and their defaults:
 require("typescript").setup({
     disable_commands = false, -- prevent the plugin from creating Vim commands
     debug = false, -- enable debug logging for commands
+    go_to_source_definition = {
+        fallback = true, -- fall back to standard LSP definition on failure
+    },
     server = { -- pass options to lspconfig's setup method
         on_attach = ...,
     },
 })
 ```
 
-**Note:** if you have `require("lspconfig").setup({})` anywhere in your config,
-make sure to remove it and pass any options you were using under the `server`
-key. lspconfig doesn't allow more than one setup call, so your config will not
-work as expected.
+Note that command-specific configuration affects Vim commands, not the Lua API.
+
+**Important:** if you have `require("lspconfig").setup({})` anywhere in your
+config, make sure to remove it and pass any options you were using under the
+`server` key. lspconfig doesn't allow more than one setup call, so your config
+will not work as expected.
 
 ## Features
 
@@ -73,7 +78,7 @@ Lua commands.
   requires specifying the full path to a `source` and `target`.
 
 - Go to source definition: `:TypescriptGoToSourceDefinition` /
-  `require("typescript").goToSourceDefinition(winnr)`
+  `require("typescript").goToSourceDefinition(winnr, opts)`
 
   > TypeScript 4.7 contains support for a new experimental editor command called
   > Go To Source Definition. It’s similar to Go To Definition, but it never
@@ -84,6 +89,11 @@ Lua commands.
 
   The command requires a position and derives it from the current window when
   using the Vim command or from the given `winnr` when using the Lua API.
+
+  `opts` is a table containing the following options:
+
+  - `fallback`: determines whether to fall back to a standard LSP definition
+    request when the server fails to find a source definition.
 
 ### Handlers
 

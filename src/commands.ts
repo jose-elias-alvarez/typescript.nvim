@@ -1,3 +1,4 @@
+import { config } from "@ts/config";
 import { goToSourceDefinition } from "@ts/go-to-source-definition";
 import { renameFile } from "@ts/rename-file";
 import {
@@ -28,7 +29,10 @@ export const setupCommands = (bufnr: number): void => {
   vim.api.nvim_buf_create_user_command(
     bufnr,
     "TypescriptGoToSourceDefinition",
-    () => goToSourceDefinition({ winnr: vim.api.nvim_get_current_win() }),
+    () =>
+      goToSourceDefinition(vim.api.nvim_get_current_win(), {
+        fallback: config.go_to_source_definition.fallback,
+      }),
     {}
   );
 
