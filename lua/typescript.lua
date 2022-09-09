@@ -2556,18 +2556,52 @@ return {
   __TS__Unpack = __TS__Unpack
 }
  end,
+["path-utils"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports.pathExists = function(filename)
+    local stat = vim.loop.fs_stat(filename)
+    local ____stat_type_0 = stat
+    if ____stat_type_0 ~= nil then
+        ____stat_type_0 = ____stat_type_0.type
+    end
+    return ____stat_type_0 ~= nil
+end
+____exports.rootPattern = function(names) return vim.fs.dirname(vim.fs.find(names, {upward = true})[1]) end
+return ____exports
+ end,
 ["config"] = function(...) 
 local ____lualib = require("lualib_bundle")
+local __TS__StringIncludes = ____lualib.__TS__StringIncludes
+local __TS__ArrayUnshift = ____lualib.__TS__ArrayUnshift
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____path_2Dutils = require("path-utils")
+local rootPattern = ____path_2Dutils.rootPattern
+local function getTsserverCommand()
+    local executable = "typescript-language-server"
+    local command = {executable, "--stdio"}
+    if __TS__StringIncludes(
+        vim.loop.os_uname().version,
+        "Windows"
+    ) then
+        __TS__ArrayUnshift(command, "cmd.exe", "/C")
+    end
+    return command
+end
 local Config = __TS__Class()
 Config.name = "Config"
 function Config.prototype.____constructor(self)
     self.disable_commands = false
     self.debug = false
-    self.server = {}
+    self.server = {
+        name = "tsserver",
+        cmd = getTsserverCommand(),
+        init_options = {hostInfo = "neovim"},
+        root_dir = function() return rootPattern({"tsconfig.json"}) or rootPattern({"package.json", "jsconfig.json", ".git"}) end
+    }
     self.go_to_source_definition = {fallback = true}
 end
 function Config.prototype.setup(self, userOpts)
@@ -2709,15 +2743,15 @@ local ____workspace_2Dcommands = require("types.workspace-commands")
 local WorkspaceCommands = ____workspace_2Dcommands.WorkspaceCommands
 local ____utils = require("utils")
 local debugLog = ____utils.debugLog
-local ____lspconfig = require("lspconfig")
-local util = ____lspconfig.util
+local ____path_2Dutils = require("path-utils")
+local pathExists = ____path_2Dutils.pathExists
 ____exports.renameFile = function(source, target, opts)
     if opts == nil then
         opts = {}
     end
     local sourceBufnr = vim.fn.bufadd(source)
     vim.fn.bufload(sourceBufnr)
-    if util.path.exists(target) and (opts.force == nil or opts.force == false) then
+    if pathExists(target) and (opts.force == nil or opts.force == false) then
         local status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No")
         if status ~= 1 then
             debugLog("user declined to overrwrite file; aborting")
@@ -2954,38 +2988,66 @@ local ____handlers = require("handlers")
 local renameHandler = ____handlers.renameHandler
 local ____methods = require("types.methods")
 local TypescriptMethods = ____methods.TypescriptMethods
-local ____lspconfig = require("lspconfig")
-local tsserver = ____lspconfig.tsserver
-____exports.setupLsp = function(overrides)
-    local resolvedConfig = __TS__ObjectAssign({}, config, overrides or ({}))
-    local ____resolvedConfig_server_0 = resolvedConfig.server
-    local on_init = ____resolvedConfig_server_0.on_init
-    local on_attach = ____resolvedConfig_server_0.on_attach
-    local handlers = ____resolvedConfig_server_0.handlers
-    resolvedConfig.server.on_init = function(client, initialize_result)
-        local ____on_init_result_1 = on_init
-        if ____on_init_result_1 ~= nil then
-            ____on_init_result_1 = ____on_init_result_1(client, initialize_result)
+local function shouldAttach(bufnr)
+    if vim.api.nvim_buf_get_option(bufnr, "buftype") ~= "" then
+        return false
+    end
+    if vim.api.nvim_buf_get_name(bufnr) == "" then
+        return false
+    end
+    return true
+end
+____exports.setupLsp = function()
+    local serverConfig = config.server
+    local on_init = serverConfig.on_init
+    local on_attach = serverConfig.on_attach
+    local handlers = serverConfig.handlers
+    local root_dir = serverConfig.root_dir
+    serverConfig.on_init = function(client, initialize_result)
+        local ____on_init_result_0 = on_init
+        if ____on_init_result_0 ~= nil then
+            ____on_init_result_0 = ____on_init_result_0(client, initialize_result)
         end
     end
-    resolvedConfig.server.on_attach = function(client, bufnr)
+    serverConfig.on_attach = function(client, bufnr)
         if not config.disable_commands then
             setupCommands(bufnr)
         end
-        local ____on_attach_result_3 = on_attach
-        if ____on_attach_result_3 ~= nil then
-            ____on_attach_result_3 = ____on_attach_result_3(client, bufnr)
+        local ____on_attach_result_2 = on_attach
+        if ____on_attach_result_2 ~= nil then
+            ____on_attach_result_2 = ____on_attach_result_2(client, bufnr)
         end
     end
-    local ____resolvedConfig_server_9 = resolvedConfig.server
-    local ____temp_7 = handlers or ({})
-    local ____TypescriptMethods_RENAME_8 = TypescriptMethods.RENAME
-    local ____handlers_TypescriptMethods_RENAME_5 = handlers
-    if ____handlers_TypescriptMethods_RENAME_5 ~= nil then
-        ____handlers_TypescriptMethods_RENAME_5 = ____handlers_TypescriptMethods_RENAME_5[TypescriptMethods.RENAME]
+    local ____temp_6 = handlers or ({})
+    local ____TypescriptMethods_RENAME_7 = TypescriptMethods.RENAME
+    local ____handlers_TypescriptMethods_RENAME_4 = handlers
+    if ____handlers_TypescriptMethods_RENAME_4 ~= nil then
+        ____handlers_TypescriptMethods_RENAME_4 = ____handlers_TypescriptMethods_RENAME_4[TypescriptMethods.RENAME]
     end
-    ____resolvedConfig_server_9.handlers = __TS__ObjectAssign({}, ____temp_7, {[____TypescriptMethods_RENAME_8] = ____handlers_TypescriptMethods_RENAME_5 or renameHandler})
-    tsserver.setup(resolvedConfig.server)
+    serverConfig.handlers = __TS__ObjectAssign({}, ____temp_6, {[____TypescriptMethods_RENAME_7] = ____handlers_TypescriptMethods_RENAME_4 or renameHandler})
+    vim.api.nvim_create_autocmd(
+        "FileType",
+        {
+            pattern = {
+                "javascript",
+                "javascriptreact",
+                "javascript.jsx",
+                "typescript",
+                "typescriptreact",
+                "typescript.tsx"
+            },
+            callback = function(args)
+                if not shouldAttach(args.buf) then
+                    return false
+                end
+                local resolvedConfig = __TS__ObjectAssign({}, serverConfig)
+                if type(root_dir) == "function" then
+                    resolvedConfig.root_dir = root_dir(args.file)
+                end
+                vim.lsp.start(resolvedConfig)
+            end
+        }
+    )
 end
 return ____exports
  end,

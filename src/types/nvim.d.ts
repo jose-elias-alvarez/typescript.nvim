@@ -61,6 +61,10 @@ declare namespace NvimLsp {
     on_attach?: (this: void, client: Client, bufnr: number) => void;
     on_init?: (this: void, client: Client, initialize_result: unknown) => void;
     handlers?: Handlers;
+    cmd: string | string[];
+    name: string;
+    root_dir: string | undefined | ((filename: string) => string | undefined);
+    init_options: Record<string, unknown>;
   }
 }
 
@@ -84,6 +88,7 @@ declare namespace vim {
   ) => T;
   const lsp: {
     handlers: NvimLsp.Handlers;
+    start: (this: void, opts: NvimLsp.ServerOptions) => number | undefined;
     buf_get_clients: (
       this: void,
       bufnr: number
@@ -123,9 +128,27 @@ declare namespace vim {
       bufnr?: number
     ) => import("vscode-languageserver-types").Diagnostic[];
   };
+  interface AutocmdArgs {
+    id: string;
+    event: string;
+    group: number | undefined;
+    match: string;
+    buf: number;
+    file: string;
+  }
   const api: {
     nvim_get_current_buf: (this: void) => number;
     nvim_get_current_win: (this: void) => number;
+    nvim_create_autocmd: (
+      this: void,
+      event: string,
+      options: {
+        group?: string | number;
+        pattern?: string | string[];
+        buffer?: number;
+        callback: string | ((this: void, args: AutocmdArgs) => boolean | void);
+      }
+    ) => number;
     nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
     nvim_buf_get_lines: (
       this: void,
@@ -171,6 +194,14 @@ declare namespace vim {
       on_confirm: (this: void, input?: string) => void
     ) => void;
   };
+  const fs: {
+    dirname: (this: void, file: string) => string;
+    find: (
+      this: void,
+      names: string[],
+      opts: { path?: string; upward?: boolean }
+    ) => string[];
+  };
   const fn: {
     confirm: (this: void, message: string, choices: string) => 0 | 1;
     bufadd: (this: void, bufname: string) => number;
@@ -185,6 +216,15 @@ declare namespace vim {
       source: string,
       target: string
     ) => LuaMultiReturn<[boolean, string | undefined]>;
+    fs_stat: (
+      this: void,
+      filename: string
+    ) =>
+      | {
+          type: string;
+        }
+      | undefined;
+    os_uname: (this: void) => { version: string };
   };
   const str_byteindex: (
     this: void,

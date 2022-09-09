@@ -1,7 +1,7 @@
 import { executeCommand } from "@ts/execute-command";
 import { WorkspaceCommands } from "@ts/types/workspace-commands";
 import { debugLog } from "@ts/utils";
-import { util } from "lspconfig";
+import { pathExists } from "./path-utils";
 
 interface Opts {
   force?: boolean;
@@ -16,7 +16,7 @@ export const renameFile = (
   vim.fn.bufload(sourceBufnr);
 
   if (
-    util.path.exists(target) &&
+    pathExists(target) &&
     (opts.force === undefined || opts.force === false)
   ) {
     const status = vim.fn.confirm("File exists! Overwrite?", "&Yes\n&No");
