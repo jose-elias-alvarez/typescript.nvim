@@ -8,9 +8,8 @@
 # typescript.nvim
 
 A minimal `typescript-language-server` integration plugin to set up the language
-server via [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and add
-commands for convenience. Written in TypeScript and transpiled to Lua using
-[TypeScriptToLua](https://github.com/TypeScriptToLua/TypeScriptToLua).
+server and add commands for convenience. Written in TypeScript and transpiled to
+Lua using [TypeScriptToLua](https://github.com/TypeScriptToLua/TypeScriptToLua).
 
 This plugin is in **beta status**. It's stable enough for daily use, but
 breaking changes are possible.
@@ -32,7 +31,7 @@ require("typescript").setup({
     go_to_source_definition = {
         fallback = true, -- fall back to standard LSP definition on failure
     },
-    server = { -- pass options to lspconfig's setup method
+    server = { -- options to pass to vim.lsp.start
         on_attach = ...,
     },
 })
@@ -40,9 +39,9 @@ require("typescript").setup({
 
 Note that command-specific configuration affects Vim commands, not the Lua API.
 
-**Important:** if you have `require("lspconfig").setup({})` anywhere in your
-config, make sure to remove it and pass any options you were using under the
-`server` key. lspconfig doesn't allow more than one setup call, so your config
+**Important:** if you have `require("lspconfig").tsserver.setup({})` anywhere in
+your config, make sure to remove it and pass any options you were using under
+the `server` key. This plugin sets up `tsserver` independently, so your config
 will not work as expected.
 
 ## Features

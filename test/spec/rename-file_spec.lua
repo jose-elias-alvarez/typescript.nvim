@@ -1,12 +1,11 @@
 local test_utils = require("./test-utils")
-local path = require("lspconfig").util.path
 
 describe("renameFile", function()
     test_utils.setup()
 
-    local old_path = path.join(test_utils.test_dir, "old-file.ts")
-    local new_path = path.join(test_utils.test_dir, "new-file.ts")
-    local linked_path = path.join(test_utils.test_dir, "linked-file.ts")
+    local old_path = test_utils.path_join(test_utils.test_dir, "old-file.ts")
+    local new_path = test_utils.path_join(test_utils.test_dir, "new-file.ts")
+    local linked_path = test_utils.path_join(test_utils.test_dir, "linked-file.ts")
 
     local file_content = [[
 export const myFunc = () => console.log("hello");]]
@@ -31,8 +30,8 @@ myFunc();]]
 
         require("typescript").renameFile(old_path, new_path)
 
-        assert.falsy(path.exists(old_path))
-        assert.truthy(path.exists(new_path))
+        assert.falsy(test_utils.path_exists(old_path))
+        assert.truthy(test_utils.path_exists(new_path))
         assert.equals(vim.api.nvim_buf_get_name(0), new_path)
         assert.equals(table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n"), file_content)
     end)

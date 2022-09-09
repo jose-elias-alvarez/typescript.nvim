@@ -17,42 +17,12 @@ const testUser: User = { name: "Jose" };
 const notification: UserNotification = { user: testUser, content: "hello" };
        ]]
 
-        describe("Lua API", function()
-            it("imports missing types", function()
-                local assert_final = test_utils.setup_test_file("add-missing-imports", content, final)
+        it("imports missing types", function()
+            local assert_final = test_utils.setup_test_file("add-missing-imports", content, final)
 
-                require("typescript").actions.addMissingImports({ sync = true })
+            require("typescript").actions.addMissingImports({ sync = true })
 
-                assert_final()
-            end)
-
-            it("does nothing when file has no missing imports", function()
-                local assert_final = test_utils.setup_test_file("add-missing-imports", final, final)
-
-                local ok = pcall(require("typescript").actions.addMissingImports, { sync = true })
-
-                assert_final()
-                assert.truthy(ok)
-            end)
-        end)
-
-        describe("Vim command", function()
-            it("imports missing types", function()
-                local assert_final = test_utils.setup_test_file("add-missing-imports", content, final)
-
-                vim.cmd("TypescriptAddMissingImports!")
-
-                assert_final()
-            end)
-
-            it("does nothing when file has no missing imports", function()
-                local assert_final = test_utils.setup_test_file("add-missing-imports", final, final)
-
-                local ok = pcall(vim.cmd, "TypescriptAddMissingImports!")
-
-                assert_final()
-                assert.truthy(ok)
-            end)
+            assert_final()
         end)
     end)
 end)

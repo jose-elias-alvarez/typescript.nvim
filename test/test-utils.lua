@@ -1,8 +1,15 @@
-local join = require("lspconfig").util.path.join
-
 local M = {}
 
-M.test_dir = join(vim.loop.cwd(), "test", "fixtures")
+M.path_join = function(...)
+    return table.concat(vim.tbl_flatten({ ... }), "/")
+end
+
+M.path_exists = function(filename)
+    local stat = vim.loop.fs_stat(filename)
+    return stat and stat.type or false
+end
+
+M.test_dir = M.path_join(vim.loop.cwd(), "test", "fixtures")
 
 M.attached = false
 
@@ -53,7 +60,7 @@ M.edit_temp_file = function(path, skip_diagnostics)
 end
 
 M.setup_test_file = function(name, content, final, skip_diagnostics)
-    local path = join(M.test_dir, name .. ".ts")
+    local path = M.path_join(M.test_dir, name .. ".ts")
     M.write_file(path, content)
     M.edit_temp_file(path, skip_diagnostics)
 
