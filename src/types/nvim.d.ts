@@ -77,6 +77,11 @@ declare namespace vim {
   const inspect: (...args: unknown[]) => void;
   const schedule: (this: void, callback: () => void) => void;
   const tbl_isempty: (this: void, tbl: unknown[]) => boolean;
+  const tbl_deep_extend: <T>(
+    this: void,
+    behavior: "error" | "keep" | "force",
+    ...tables: T[]
+  ) => T;
   const lsp: {
     handlers: NvimLsp.Handlers;
     buf_get_clients: (

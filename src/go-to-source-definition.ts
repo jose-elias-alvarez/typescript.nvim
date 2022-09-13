@@ -5,10 +5,13 @@ import { getClient, resolveHandler } from "@ts/utils";
 import { Location } from "vscode-languageserver-types";
 
 interface Opts {
-  winnr: number;
+  fallback?: boolean;
 }
 
-export const goToSourceDefinition = ({ winnr }: Opts): boolean => {
+export const goToSourceDefinition = (
+  winnr: number,
+  { fallback }: Opts
+): boolean => {
   const bufnr = vim.api.nvim_win_get_buf(winnr);
   const client = getClient(bufnr);
   if (!client) {
@@ -27,17 +30,26 @@ export const goToSourceDefinition = ({ winnr }: Opts): boolean => {
       arguments: [positionParams.textDocument.uri, positionParams.position],
     },
     (...args) => {
-      const res = args[1];
-      if (vim.tbl_isempty(res)) {
-        print("failed to go to source definition: no source definitions found");
-        return;
-      }
-
       const handler = resolveHandler(bufnr, Methods.DEFINITION);
       if (!handler) {
         print(
           "failed to go to source definition: could not resolve definition handler"
         );
+        return;
+      }
+
+      const res = args[1];
+      if (vim.tbl_isempty(res)) {
+        if (fallback === true) {
+          return client.request(
+            Methods.DEFINITION,
+            positionParams,
+            handler,
+            bufnr
+          );
+        }
+
+        print("failed to go to source definition: no source definitions found");
         return;
       }
 
