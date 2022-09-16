@@ -14,7 +14,6 @@ declare namespace NvimLsp {
   }
 
   type Handler<T = unknown> = (
-    this: void,
     err: unknown,
     res: T[],
     ctx: HandlerContext,
@@ -24,6 +23,7 @@ declare namespace NvimLsp {
     [method: string]: Handler;
   };
 
+  /** @noSelf **/
   interface Client {
     name: string;
     // neovim 0.7
@@ -38,14 +38,12 @@ declare namespace NvimLsp {
     };
     offset_encoding: string;
     request: <T, U = Record<string, unknown>>(
-      this: void,
       method: import("./methods").Methods,
       params: U,
       handler?: Handler<T>,
       bufnr?: number
     ) => boolean;
     request_sync: <T, U = Record<string, unknown>>(
-      this: void,
       method: import("./methods").Methods,
       params: U,
       timeout_ms?: number,
@@ -54,12 +52,10 @@ declare namespace NvimLsp {
     handlers: Handlers;
   }
 
-  // used in vim.lsp.buf.* callbacks to filter clients
-  type ClientFilter = (this: void, client: Client) => boolean;
-
+  /** @noSelf **/
   interface ServerOptions {
-    on_attach?: (this: void, client: Client, bufnr: number) => void;
-    on_init?: (this: void, client: Client, initialize_result: unknown) => void;
+    on_attach?: (client: Client, bufnr: number) => void;
+    on_init?: (client: Client, initialize_result: unknown) => void;
     handlers?: Handlers;
   }
 }
@@ -73,123 +69,112 @@ declare namespace Nvim {
   }
 }
 
+/** @noSelf **/
 declare namespace vim {
   const inspect: (...args: unknown[]) => void;
-  const schedule: (this: void, callback: () => void) => void;
-  const tbl_isempty: (this: void, tbl: unknown[]) => boolean;
+  const schedule: (callback: () => void) => void;
+  const tbl_isempty: (tbl: unknown[]) => boolean;
   const tbl_deep_extend: <T>(
-    this: void,
     behavior: "error" | "keep" | "force",
     ...tables: T[]
   ) => T;
-  const lsp: {
-    handlers: NvimLsp.Handlers;
-    buf_get_clients: (
-      this: void,
-      bufnr: number
-    ) => LuaTable<number, NvimLsp.Client>;
-    util: {
-      make_range_params: (this: void) => {
+
+  namespace lsp {
+    const handlers: NvimLsp.Handlers;
+    const buf_get_clients: (bufnr: number) => LuaTable<number, NvimLsp.Client>;
+    namespace util {
+      const make_range_params: () => {
         textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
         range: import("vscode-languageserver-types").Range;
         context?: import("vscode-languageserver-types").CodeActionContext;
       };
-      make_position_params: (
-        this: void,
+      const make_position_params: (
         winnr: number,
         offset_encoding: string
       ) => {
         textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
         position: import("vscode-languageserver-types").Position;
       };
-      apply_text_edits: (
-        this: void,
+      const apply_text_edits: (
         edits: import("vscode-languageserver-types").TextEdit[],
         bufnr: number,
         offset_encoding: string
       ) => void;
-    };
-    buf: {
-      rename: (
-        this: void,
+    }
+    namespace buf {
+      const rename: (
         newName?: string,
-        options?: { filter?: NvimLsp.ClientFilter; name?: string }
+        options?: Record<string, unknown>
       ) => void;
-    };
-  };
-  const diagnostic: {
-    get: (
-      this: void,
+    }
+  }
+
+  namespace diagnostic {
+    const get: (
       bufnr?: number
     ) => import("vscode-languageserver-types").Diagnostic[];
-  };
-  const api: {
-    nvim_get_current_buf: (this: void) => number;
-    nvim_get_current_win: (this: void) => number;
-    nvim_buf_call: (this: void, bufnr: number, callback: () => void) => void;
-    nvim_buf_get_lines: (
-      this: void,
+  }
+
+  namespace api {
+    const nvim_get_current_buf: () => number;
+    const nvim_get_current_win: () => number;
+    const nvim_buf_call: (bufnr: number, callback: () => void) => void;
+    const nvim_buf_get_lines: (
       bufnr: number,
       start: number,
       end: number,
       strictIndexing: boolean
     ) => string[];
-    nvim_buf_get_name: (this: void, bufnr: number) => string;
-    nvim_buf_create_user_command: (
-      this: void,
+    const nvim_buf_get_name: (bufnr: number) => string;
+    const nvim_buf_create_user_command: (
       bufnr: number,
       name: string,
       command: (opts: Nvim.CommandOptions) => void,
       attributes: Nvim.CommandAttributes
     ) => void;
-    nvim_buf_get_option: <T>(this: void, bufnr: number, name: string) => T;
-    nvim_buf_delete: (
-      this: void,
-      bufnr: number,
-      opts?: { force?: boolean }
-    ) => void;
-    nvim_list_wins: (this: void) => number[];
-    nvim_win_get_buf: (this: void, win: number) => number;
-    nvim_win_set_buf: (this: void, win: number, bufnr: number) => void;
-    nvim_win_set_cursor: (
-      this: void,
+    const nvim_buf_get_option: <T>(bufnr: number, name: string) => T;
+    const nvim_buf_delete: (bufnr: number, opts?: { force?: boolean }) => void;
+    const nvim_list_wins: () => number[];
+    const nvim_win_get_buf: (win: number) => number;
+    const nvim_win_set_buf: (win: number, bufnr: number) => void;
+    const nvim_win_set_cursor: (
       win: number,
       pos: [row: number, col: number]
     ) => void;
-    nvim_buf_set_option: (
-      this: void,
+    const nvim_buf_set_option: (
       buffer: number,
       name: string,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any
     ) => void;
-  };
-  const ui: {
-    input: (
-      this: void,
+  }
+
+  namespace ui {
+    const input: (
       opts: { prompt?: string; default?: string },
-      on_confirm: (this: void, input?: string) => void
+      on_confirm: (input?: string) => void
     ) => void;
-  };
-  const fn: {
-    confirm: (this: void, message: string, choices: string) => 0 | 1;
-    bufadd: (this: void, bufname: string) => number;
-    bufload: (this: void, bufnr: number) => void;
-    has: (this: void, feature: string) => 0 | 1;
-  };
-  const cmd: (this: void, command: string) => void;
-  const uri_from_fname: (this: void, fname: string) => string;
-  const loop: {
-    fs_rename: (
-      this: void,
+  }
+
+  namespace fn {
+    const confirm: (message: string, choices: string) => 0 | 1;
+    const bufadd: (bufname: string) => number;
+    const bufload: (bufnr: number) => void;
+    const has: (feature: string) => 0 | 1;
+  }
+
+  namespace loop {
+    const fs_rename: (
       source: string,
       target: string
     ) => LuaMultiReturn<[boolean, string | undefined]>;
-  };
+  }
+
+  const cmd: (command: string) => void;
   const str_byteindex: (
-    this: void,
     str: string,
     index: number,
     useUtf16?: boolean
   ) => number;
+  const uri_from_fname: (fname: string) => string;
 }
