@@ -6,15 +6,15 @@
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
-    "@types/node": "^18.7.15",
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
-    "eslint": "^8.23.0",
+    "@types/node": "^18.7.18",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "lua-types": "^2.13.0",
     "prettier": "^2.7.1",
-    "typescript": "^4.8.2",
+    "typescript": "^4.8.3",
     "typescript-to-lua": "^1.10.0",
     "vscode-languageserver-types": "^3.17.2"
   }
