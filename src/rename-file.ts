@@ -1,7 +1,7 @@
 import { executeCommand } from "@ts/execute-command";
 import { WorkspaceCommands } from "@ts/types/workspace-commands";
 import { debugLog } from "@ts/utils";
-import { pathExists } from "./path-utils";
+import { pathExists } from "@ts/path-utils";
 
 interface Opts {
   force?: boolean;
