@@ -94,6 +94,16 @@ Lua commands.
   - `fallback`: determines whether to fall back to a standard LSP definition
     request when the server fails to find a source definition.
 
+- Restart server: `:TypescriptRestartServer` /
+  `require("typescript").restartServer(opts)`
+
+  Restarts the `typescript-language-server` instance attached to the buffer
+  specified in `opts.bufnr` (defaults to the current buffer). Add a `!` or
+  specify `opts.force` to force the server to stop.
+
+  To ensure the server can properly reattach, the command will write the file
+  corresponding to `bufnr` to the disk.
+
 ### Handlers
 
 The plugin defines handlers for off-spec methods that are not otherwise

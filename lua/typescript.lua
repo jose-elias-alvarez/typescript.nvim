@@ -2881,6 +2881,31 @@ ____exports.fixAll = makeCommand(SourceActions.SourceFixAllTs)
 ____exports.removeUnused = makeCommand(SourceActions.SourceRemoveUnusedTs)
 return ____exports
  end,
+["restart-server"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____utils = require("utils")
+local getClient = ____utils.getClient
+____exports.restartServer = function(____bindingPattern0)
+    local force
+    local bufnr
+    bufnr = ____bindingPattern0.bufnr
+    if bufnr == nil then
+        bufnr = vim.api.nvim_get_current_buf()
+    end
+    force = ____bindingPattern0.force
+    local client = getClient(bufnr)
+    if not client then
+        return
+    end
+    client.stop(force)
+    vim.api.nvim_buf_call(
+        bufnr,
+        function() return vim.cmd("write | edit") end
+    )
+end
+return ____exports
+ end,
 ["commands"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -2895,6 +2920,8 @@ local addMissingImports = ____source_2Dactions.addMissingImports
 local fixAll = ____source_2Dactions.fixAll
 local organizeImports = ____source_2Dactions.organizeImports
 local removeUnused = ____source_2Dactions.removeUnused
+local ____restart_2Dserver = require("restart-server")
+local restartServer = ____restart_2Dserver.restartServer
 ____exports.setupCommands = function(bufnr)
     vim.api.nvim_buf_create_user_command(
         bufnr,
@@ -2944,6 +2971,12 @@ ____exports.setupCommands = function(bufnr)
         bufnr,
         "TypescriptRemoveUnused",
         function(opts) return removeUnused({sync = opts.bang, bufnr = bufnr}) end,
+        {bang = true}
+    )
+    vim.api.nvim_buf_create_user_command(
+        bufnr,
+        "TypescriptRestartServer",
+        function(opts) return restartServer({force = opts.bang, bufnr = bufnr}) end,
         {bang = true}
     )
 end
@@ -3071,6 +3104,11 @@ do
     local ____rename_2Dfile = require("rename-file")
     local renameFile = ____rename_2Dfile.renameFile
     ____exports.renameFile = renameFile
+end
+do
+    local ____restart_2Dserver = require("restart-server")
+    local restartServer = ____restart_2Dserver.restartServer
+    ____exports.restartServer = restartServer
 end
 ____exports.actions = require("source-actions")
 return ____exports

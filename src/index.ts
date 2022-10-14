@@ -8,4 +8,5 @@ export const setup = (userOptions: ConfigOptions): void => {
 
 export { goToSourceDefinition } from "@ts/go-to-source-definition";
 export { renameFile } from "@ts/rename-file";
+export { restartServer } from "@ts/restart-server";
 export * as actions from "@ts/source-actions";

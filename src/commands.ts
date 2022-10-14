@@ -7,6 +7,7 @@ import {
   organizeImports,
   removeUnused,
 } from "@ts/source-actions";
+import { restartServer } from "./restart-server";
 
 export const setupCommands = (bufnr: number): void => {
   vim.api.nvim_buf_create_user_command(
@@ -58,6 +59,13 @@ export const setupCommands = (bufnr: number): void => {
     bufnr,
     "TypescriptRemoveUnused",
     (opts) => removeUnused({ sync: opts.bang, bufnr }),
+    { bang: true }
+  );
+
+  vim.api.nvim_buf_create_user_command(
+    bufnr,
+    "TypescriptRestartServer",
+    (opts) => restartServer({ force: opts.bang, bufnr }),
     { bang: true }
   );
 };

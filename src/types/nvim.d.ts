@@ -50,6 +50,7 @@ declare namespace NvimLsp {
       bufnr?: number
     ) => { result: T[] };
     handlers: Handlers;
+    stop: (force?: boolean) => void;
   }
 
   /** @noSelf **/
