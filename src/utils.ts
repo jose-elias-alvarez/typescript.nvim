@@ -8,7 +8,7 @@ export const debugLog = (...args: unknown[]): void => {
 };
 
 export const getClient = (bufnr: number): NvimLsp.Client | undefined => {
-  for (const [, client] of vim.lsp.buf_get_clients(bufnr)) {
+  for (const [, client] of vim.lsp.get_active_clients({ bufnr })) {
     if (client.name === "tsserver") {
       return client;
     }

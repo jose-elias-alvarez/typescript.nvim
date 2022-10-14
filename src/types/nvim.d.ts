@@ -81,7 +81,11 @@ declare namespace vim {
 
   namespace lsp {
     const handlers: NvimLsp.Handlers;
-    const buf_get_clients: (bufnr: number) => LuaTable<number, NvimLsp.Client>;
+    const get_active_clients: (filter: {
+      id?: number;
+      bufnr?: number;
+      name?: number;
+    }) => LuaTable<number, NvimLsp.Client>;
     namespace util {
       const make_range_params: () => {
         textDocument: import("vscode-languageserver-types").TextDocumentIdentifier;
@@ -107,6 +111,8 @@ declare namespace vim {
         options?: Record<string, unknown>
       ) => void;
     }
+    /** @deprecated */
+    const buf_get_clients: (bufnr: number) => LuaTable<number, NvimLsp.Client>;
   }
 
   namespace diagnostic {
