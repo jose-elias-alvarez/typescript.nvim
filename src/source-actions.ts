@@ -73,7 +73,7 @@ const makeCommand =
       client.request<Result, SourceActionParams>(
         Methods.CODE_ACTION,
         params,
-        (_, res) => applyEdits(res),
+        (_, res) => applyEdits(res || []),
         bufnr
       );
     }

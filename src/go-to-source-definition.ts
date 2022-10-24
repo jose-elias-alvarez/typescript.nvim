@@ -38,7 +38,7 @@ export const goToSourceDefinition = (
         return;
       }
 
-      const res = args[1];
+      const res = args[1] || [];
       if (vim.tbl_isempty(res)) {
         if (fallback === true) {
           return client.request(

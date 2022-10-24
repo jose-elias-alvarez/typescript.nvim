@@ -2675,7 +2675,7 @@ ____exports.goToSourceDefinition = function(winnr, ____bindingPattern0)
                 print("failed to go to source definition: could not resolve definition handler")
                 return
             end
-            local res = args[2]
+            local res = args[2] or ({})
             if vim.tbl_isempty(res) then
                 if fallback == true then
                     return client.request(Methods.DEFINITION, positionParams, handler, bufnr)
@@ -2835,7 +2835,7 @@ local function makeCommand(sourceAction)
             client.request(
                 Methods.CODE_ACTION,
                 params,
-                function(_, res) return applyEdits(res) end,
+                function(_, res) return applyEdits(res or ({})) end,
                 bufnr
             )
         end

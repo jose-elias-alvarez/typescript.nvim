@@ -15,7 +15,7 @@ declare namespace NvimLsp {
 
   type Handler<T = unknown> = (
     err: unknown,
-    res: T[],
+    res: T[] | undefined,
     ctx: HandlerContext,
     config: Record<string, unknown>
   ) => void;
