@@ -1,11 +1,17 @@
 {
   "extends": "./tsconfig",
-  "exclude": ["test", "__mocks__", "jest.config.ts"],
+  "exclude": [
+    "test",
+    "__mocks__",
+    "jest.config.ts"
+  ],
   "tstl": {
     "luaTarget": "JIT",
-    "luaBundle": "./lua/typescript.lua",
+    "luaBundle": "./lua/typescript/init.lua",
     "luaBundleEntry": "./src/index.ts",
-    "noResolvePaths": ["lspconfig"],
+    "noResolvePaths": [
+      "lspconfig"
+    ],
     "noImplicitSelf": true
   }
 }
