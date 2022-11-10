@@ -103,6 +103,29 @@ supported by Neovim.
 - `_typescript.rename`: invoked after certain code actions (e.g. when extracting
   a function to local / global scope).
 
+## Other Plugins Integration
+
+### null-ls
+
+You can add all available commands to the lsp code actions via [null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim).
+The commands will *always show* when you open the code actions for file types *.ts, *.tsx, .*js, and .*jsx.
+
+**List of commands shown in code actions**
+
+- Add Missing Imports
+- Fix All
+- Organize Imports
+- Remove Unused
+
+```lua
+require("null_ls").setup({
+  sources = {
+    ...,
+    require("typescript.extensions.null-ls.code-actions"),
+  },
+})
+```
+
 ## Not yet implemented
 
 - Inlay hints (waiting for
