@@ -40,7 +40,7 @@ require("typescript").setup({
 
 Note that command-specific configuration affects Vim commands, not the Lua API.
 
-**Important:** if you have `require("lspconfig").setup({})` anywhere in your
+**Important:** if you have `require("lspconfig").tsserver.setup({})` anywhere in your
 config, make sure to remove it and pass any options you were using under the
 `server` key. lspconfig doesn't allow more than one setup call, so your config
 will not work as expected.
