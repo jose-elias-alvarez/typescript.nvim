@@ -2724,6 +2724,11 @@ ____exports.renameFile = function(source, target, opts)
             return false
         end
     end
+    debugLog(("recursively creating parent dirs for rename (" .. target) .. ")")
+    vim.fn.mkdir(
+        vim.fn.fnamemodify(target, ":p:h"),
+        "p"
+    )
     debugLog((("sending request to rename source " .. source) .. " to target ") .. target)
     local requestOk = executeCommand(
         sourceBufnr,

@@ -26,6 +26,9 @@ export const renameFile = (
     }
   }
 
+  debugLog(`recursively creating parent dirs for rename (${target})`);
+  vim.fn.mkdir(vim.fn.fnamemodify(target, ":p:h"), "p");
+
   debugLog(`sending request to rename source ${source} to target ${target}`);
   const requestOk = executeCommand(sourceBufnr, {
     command: WorkspaceCommands.APPLY_RENAME_FILE,
