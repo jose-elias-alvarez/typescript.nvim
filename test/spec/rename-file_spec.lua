@@ -6,8 +6,6 @@ describe("renameFile", function()
 
     local old_path = path.join(test_utils.test_dir, "old-file.ts")
     local new_path = path.join(test_utils.test_dir, "new-file.ts")
-    local new_parent_dir = path.join(test_utils.test_dir, "new_dir")
-    local new_path_with_new_parent = path.join(new_parent_dir, "new-file.ts")
     local linked_path = path.join(test_utils.test_dir, "linked-file.ts")
 
     local file_content = [[
@@ -24,8 +22,6 @@ myFunc();]]
     after_each(function()
         vim.loop.fs_unlink(old_path)
         vim.loop.fs_unlink(new_path)
-        vim.loop.fs_unlink(new_path_with_new_parent)
-        vim.loop.fs_unlink(new_parent_dir)
         vim.loop.fs_unlink(linked_path)
     end)
 
@@ -39,18 +35,6 @@ myFunc();]]
         assert.truthy(path.exists(new_path))
         assert.equals(vim.api.nvim_buf_get_name(0), new_path)
         assert.equals(table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n"), file_content)
-    end)
-
-    it("creates parent directory and moves old file content into new file", function()
-        test_utils.write_file(old_path, file_content)
-        test_utils.edit_temp_file(old_path)
-
-        require("typescript").renameFile(old_path, new_path_with_new_parent)
-
-        assert.falsy(path.exists(old_path))
-        assert.truthy(path.exists(new_path_with_new_parent))
-        -- assert.equals(vim.api.nvim_buf_get_name(0), new_path_with_new_parent)
-        -- assert.equals(table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n"), file_content)
     end)
 
     it("updates path in linked file", function()
