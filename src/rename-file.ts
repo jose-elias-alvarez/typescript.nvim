@@ -26,7 +26,8 @@ export const renameFile = (
     }
   }
 
-  debugLog(`recursively creating parent dirs for rename (${target})`);
+  // if the target location is under a directory which does not already exist,
+  // the path must first be created in order for the rename to be successful.
   vim.fn.mkdir(vim.fn.fnamemodify(target, ":p:h"), "p");
 
   debugLog(`sending request to rename source ${source} to target ${target}`);
