@@ -167,6 +167,8 @@ declare namespace vim {
     const bufadd: (bufname: string) => number;
     const bufload: (bufnr: number) => void;
     const has: (feature: string) => 0 | 1;
+    const mkdir: (name: string, path?: string, prot?: number) => void;
+    const fnamemodify: (fname: string, mods: string) => string;
   }
 
   namespace loop {

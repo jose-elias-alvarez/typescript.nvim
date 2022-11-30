@@ -26,6 +26,10 @@ export const renameFile = (
     }
   }
 
+  // if the target location is under a directory which does not already exist,
+  // the path must first be created in order for the rename to be successful.
+  vim.fn.mkdir(vim.fn.fnamemodify(target, ":p:h"), "p");
+
   debugLog(`sending request to rename source ${source} to target ${target}`);
   const requestOk = executeCommand(sourceBufnr, {
     command: WorkspaceCommands.APPLY_RENAME_FILE,

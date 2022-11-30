@@ -2724,6 +2724,10 @@ ____exports.renameFile = function(source, target, opts)
             return false
         end
     end
+    vim.fn.mkdir(
+        vim.fn.fnamemodify(target, ":p:h"),
+        "p"
+    )
     debugLog((("sending request to rename source " .. source) .. " to target ") .. target)
     local requestOk = executeCommand(
         sourceBufnr,
