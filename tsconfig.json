@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/vscode-typescript-to-lua/master/tsconfig-schema.json",
   "compilerOptions": {
     "target": "esnext",
     "lib": ["esnext"],
