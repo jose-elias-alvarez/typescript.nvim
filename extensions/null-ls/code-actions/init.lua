@@ -1,21 +1,20 @@
-local helpers_ok, helpers = pcall(require, "null-ls.helpers")
-if not helpers_ok then
-	return
+local null_ls = require("null-ls")
+
+local name_to_tile = function(name)
+    local title = name:gsub(".%f[%l]", " %1"):gsub("%l%f[%u]", "%1 "):lower() -- add spaces
+    title = title:sub(1, 1):upper() .. title:sub(2) -- capitalize first letter, to match tsserver actions
+    return title
 end
 
-local methods_ok, methods = pcall(require, "null-ls.methods")
-if not methods_ok then
-	return
-end
-
-return helpers.make_builtin({
+return {
     name = "typescript",
-    meta = {
-        url = "https://github.com/jose-elias-alvarez/typescript.nvim",
-        description = "A Lua plugin, written in TypeScript, to write TypeScript (Lua optional).",
+    method = null_ls.methods.CODE_ACTION,
+    filetypes = {
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
     },
-    method = methods.internal.CODE_ACTION,
-    filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
     generator = {
         fn = function(params)
             local typescript = require("typescript")
@@ -24,7 +23,7 @@ return helpers.make_builtin({
             for name, action in pairs(typescript.actions) do
                 local cb = action
                 table.insert(actions, {
-                    title = name:gsub(".%f[%l]", " %1"):gsub("%l%f[%u]", "%1 "):gsub("^.", string.upper),
+                    title = name_to_tile(name),
                     action = function()
                         vim.api.nvim_buf_call(params.bufnr, cb)
                     end,
@@ -33,4 +32,4 @@ return helpers.make_builtin({
             return actions
         end,
     },
-})
+}
