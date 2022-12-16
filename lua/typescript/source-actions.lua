@@ -1,5 +1,17 @@
-local ____lualib = require("typescript.lualib_bundle")
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+-- Lua Library inline imports
+local function __TS__ObjectAssign(target, ...)
+    local sources = {...}
+    for i = 1, #sources do
+        local source = sources[i]
+        for key in pairs(source) do
+            target[key] = source[key]
+        end
+    end
+    return target
+end
+
+-- End of Lua Library inline imports
 local ____exports = {}
 local ____methods = require("typescript.types.methods")
 local Methods = ____methods.Methods

@@ -1,7 +1,30 @@
-local ____lualib = require("typescript.lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+-- Lua Library inline imports
+local function __TS__Class(self)
+    local c = {prototype = {}}
+    c.prototype.__index = c.prototype
+    c.prototype.constructor = c
+    return c
+end
+
+local function __TS__ObjectAssign(target, ...)
+    local sources = {...}
+    for i = 1, #sources do
+        local source = sources[i]
+        for key in pairs(source) do
+            target[key] = source[key]
+        end
+    end
+    return target
+end
+
+local function __TS__New(target, ...)
+    local instance = setmetatable({}, target.prototype)
+    instance:____constructor(...)
+    return instance
+end
+
+-- End of Lua Library inline imports
 local ____exports = {}
 local Config = __TS__Class()
 Config.name = "Config"

@@ -9,7 +9,8 @@
     "luaTarget": "JIT",
     "noResolvePaths": ["lspconfig"],
     "noImplicitSelf": true,
-    "luaPlugins": [{ "name": "./plugins/fix-require-path.ts" }]
+    "luaPlugins": [{ "name": "./plugins/fix-require-path.ts" }],
+    "luaLibImport": "inline"
   },
   "include": ["src"]
 }
