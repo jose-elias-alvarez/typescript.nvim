@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prebuild": "npm run lint",
-    "build": "tstl -p tsconfig.build.json",
+    "build": "rm -rf lua && tstl -p tsconfig.build.json && cp -R extensions lua/typescript/extensions",
     "dev": "tstl -p tsconfig.build.json --watch",
     "lint": "eslint . --ext .ts"
   },

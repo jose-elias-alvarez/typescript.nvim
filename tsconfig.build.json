@@ -1,12 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
-  "extends": "./tsconfig",
-  "exclude": ["test", "__mocks__", "jest.config.ts"],
+  "extends": "./tsconfig.lua.json",
+  "exclude": ["test"],
+  "compilerOptions": {
+    "outDir": "lua/typescript"
+  },
   "tstl": {
     "luaTarget": "JIT",
-    "luaBundle": "./lua/typescript/init.lua",
-    "luaBundleEntry": "./src/index.ts",
     "noResolvePaths": ["lspconfig"],
-    "noImplicitSelf": true
-  }
+    "noImplicitSelf": true,
+    "luaPlugins": [{ "name": "./plugins/fix-require-path.ts" }]
+  },
+  "include": ["src"]
 }
