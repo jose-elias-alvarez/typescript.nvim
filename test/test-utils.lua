@@ -35,8 +35,8 @@ M.write_file = function(path, content)
     vim.loop.fs_close(fd)
 end
 
-M.has_content = function(bufnr, content)
-    return table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n") == content
+M.get_content = function(bufnr)
+    return table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
 end
 
 M.edit_temp_file = function(path, skip_diagnostics)
@@ -67,7 +67,7 @@ M.setup_test_file = function(name, content, final, skip_diagnostics)
     })
 
     return function()
-        assert.truthy(M.has_content(bufnr, final))
+        assert.equals(M.get_content(bufnr), final)
     end
 end
 

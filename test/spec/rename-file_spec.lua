@@ -46,8 +46,8 @@ myFunc();]]
 
         -- wait for workspace/applyEdit request to come back from server
         vim.wait(1000, function()
-            return test_utils.has_content(0, final_linked_file_content)
+            return test_utils.get_content(0) == final_linked_file_content
         end)
-        assert.truthy(test_utils.has_content(0, final_linked_file_content))
+        assert.equals(test_utils.get_content(0), final_linked_file_content)
     end)
 end)
