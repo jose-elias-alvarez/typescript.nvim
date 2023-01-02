@@ -40,10 +40,10 @@ require("typescript").setup({
 
 Note that command-specific configuration affects Vim commands, not the Lua API.
 
-**Important:** if you have `require("lspconfig").tsserver.setup({})` anywhere in your
-config, make sure to remove it and pass any options you were using under the
-`server` key. lspconfig doesn't allow more than one setup call, so your config
-will not work as expected.
+**Important:** if you have `require("lspconfig").tsserver.setup({})` anywhere in
+your config, make sure to remove it and pass any options you were using under
+the `server` key. lspconfig doesn't allow more than one setup call, so your
+config will not work as expected.
 
 ## Features
 
@@ -103,24 +103,27 @@ supported by Neovim.
 - `_typescript.rename`: invoked after certain code actions (e.g. when extracting
   a function to local / global scope).
 
-## Other Plugins Integration
+## Integrations
 
 ### null-ls
 
-You can add all available commands to the lsp code actions via [null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim).
-The commands will *always show* when you open the code actions for file types *.ts, *.tsx, .*js, and .*jsx.
+Instead of using the above Vim commands, you can instead add commands to your
+code action menu using
+[null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim).
 
-**List of commands shown in code actions**
+### Commands Available as Code Actions
 
-- Add Missing Imports
-- Fix All
-- Organize Imports
-- Remove Unused
+- Add missing imports
+- Fix all
+- Organize imports
+- Remove unused
+
+### Setup
 
 ```lua
 require("null_ls").setup({
   sources = {
-    ...,
+    ..., -- add to your other sources
     require("typescript.extensions.null-ls.code-actions"),
   },
 })
@@ -137,10 +140,24 @@ require("null_ls").setup({
 
 ## Contributing
 
+### TypeScript Code
+
 1. Clone the repo and run `npm install`.
 2. Change or add TypeScript source files under the `src/` directory.
-3. Test your changes locally with `npm run dev`.
-4. Build your changes before committing with `npm run build`.
+3. Try out your changes locally using `npm run dev`.
+4. Build your changes before committing using `npm run build`.
+
+### Lua Code
+
+Lua-only extensions live in the `extensions/` directory. Running `npm run build`
+copies extensions to the appropriate plugin directory and makes them available
+to Neovim under the `typescript.extensions` namespace (or a subdirectory if you
+choose to use one).
+
+If you update or add a Lua file, make sure to run `npm run build` before
+committing! Your changes will not take effect otherwise.
+
+## Tests
 
 Integration tests are in Lua and depend on
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim). Run `make test` from

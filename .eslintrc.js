@@ -12,6 +12,6 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "warn",
   },
   parserOptions: {
-    project: "./tsconfig.json",
+    project: ["./tsconfig.lua.json", "./tsconfig.node.json"],
   },
 };
