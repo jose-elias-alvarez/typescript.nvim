@@ -6,7 +6,7 @@ local name_to_tile = function(name)
     return title
 end
 
-return {
+return require("null-ls.helpers").make_builtin({
     name = "typescript",
     method = null_ls.methods.CODE_ACTION,
     filetypes = {
@@ -32,4 +32,4 @@ return {
             return actions
         end,
     },
-}
+})
