@@ -118,7 +118,7 @@ code action menu using
 - Organize imports
 - Remove unused
 
-### Setup
+### Code Action Setup
 
 ```lua
 require("null_ls").setup({
