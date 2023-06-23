@@ -138,7 +138,7 @@ require("null_ls").setup({
 - How do I enable inlay hints?
   - Ensure you have installed Neovim >= v0.10.0. Inlay hints will not work in previous versions.
   - Enable the desired inlay hint options in the server settings, e.g.:
-  ```lua
+```lua
 require("typescript").setup({
   server = {
     settings={
@@ -167,7 +167,7 @@ require("typescript").setup({
     },
   },
 })
-  ```
+```
 
 ## Contributing
 
