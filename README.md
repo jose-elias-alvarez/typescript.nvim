@@ -129,14 +129,51 @@ require("null_ls").setup({
 })
 ```
 
-## Not yet implemented
-
-- Inlay hints (waiting for
-  [upstream support](https://github.com/neovim/neovim/issues/18086))
-
 ## Will not support
 
 - Anything not supported by `typescript-language-server` itself
+
+## FAQ
+
+- How do I enable inlay hints?
+  - Ensure you have installed Neovim >= v0.10.0. Inlay hints will not work in previous versions.
+  - Enable the `inlay_hint` option in your `on_attach` function **AND** set your desired settings in the server setup, e.g.:
+```lua
+require("typescript").setup({
+  server = {
+    on_attach = function(client, bufnr)
+      -- your other on_attach stuff here if you have any
+      -- ...
+      vim.lsp.buf.inlay_hint(bufnr, true)
+    end,
+    settings={
+      -- specify some or all of the following settings if you want to adjust the default behavior
+      javascript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = true,
+        },
+      },
+      typescript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = true,
+        },
+      },
+    },
+  },
+})
+```
 
 ## Contributing
 
