@@ -6,6 +6,7 @@ declare module "lspconfig" {
   namespace util {
     namespace path {
       const exists: (path: string) => boolean;
+      const is_dir: (path: string) => boolean;
     }
   }
 }

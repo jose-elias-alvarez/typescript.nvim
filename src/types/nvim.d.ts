@@ -168,6 +168,7 @@ declare namespace vim {
     const bufload: (bufnr: number) => void;
     const has: (feature: string) => 0 | 1;
     const mkdir: (name: string, path?: string, prot?: number) => void;
+    const readdir: (name: string) => string[];
     const fnamemodify: (fname: string, mods: string) => string;
   }
 

@@ -1,6 +1,7 @@
 import { config } from "@ts/config";
 import { goToSourceDefinition } from "@ts/go-to-source-definition";
 import { renameFile } from "@ts/rename-file";
+import { renameFolder } from "@ts/rename-folder";
 import {
   addMissingImports,
   fixAll,
@@ -22,6 +23,42 @@ export const setupCommands = (bufnr: number): void => {
           force: opts.bang,
         });
       });
+    },
+    { bang: true }
+  );
+
+  vim.api.nvim_buf_create_user_command(
+    bufnr,
+    "TypescriptRenameFolder",
+    (opts) => {
+      const sourceFile = vim.api.nvim_buf_get_name(bufnr);
+      vim.ui.input(
+        { prompt: "Old path: ", default: sourceFile },
+        (sourceInput) => {
+          if (
+            sourceInput === "" ||
+            sourceInput === sourceFile ||
+            sourceInput === undefined
+          ) {
+            return;
+          }
+          vim.ui.input(
+            { prompt: "New path: ", default: sourceFile },
+            (targetInput) => {
+              if (
+                targetInput === "" ||
+                targetInput === sourceFile ||
+                targetInput === undefined
+              ) {
+                return;
+              }
+              renameFolder(sourceInput, targetInput, {
+                force: opts.bang,
+              });
+            }
+          );
+        }
+      );
     },
     { bang: true }
   );
